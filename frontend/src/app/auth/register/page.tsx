@@ -60,7 +60,7 @@ export default function RegisterPage() {
     
     const validIds = MOCK_VALID_IDS[formData.userType as keyof typeof MOCK_VALID_IDS];
     if (!validIds.includes(formData.idCode.toUpperCase())) {
-      setError(`Invalid ID for ${formData.userType}. Try e.g., ${validIds[0]}`);
+      setFieldErrors({ idCode: `Invalid ID. Try e.g., ${validIds[0]}` });
       setLoading(false);
       return;
     }
