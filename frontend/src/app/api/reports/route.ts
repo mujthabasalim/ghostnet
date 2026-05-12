@@ -25,18 +25,40 @@ export async function GET() {
       let lat = null;
       let lng = null;
 
-      // Supabase often returns geography as a GeoJSON object in API routes
       if (net.location) {
         if (typeof net.location === 'object') {
-          // It's a GeoJSON Point: { type: "Point", coordinates: [lng, lat] }
           lng = net.location.coordinates[0];
           lat = net.location.coordinates[1];
         } else if (typeof net.location === 'string') {
-          // It might be a WKT string like "POINT(lng lat)"
-          const matches = net.location.match(/POINT\(([-\d.]+) ([-\d.]+)\)/);
-          if (matches) {
-            lng = parseFloat(matches[1]);
-            lat = parseFloat(matches[2]);
+          // Handle WKB Hex format (PostGIS raw)
+          if (net.location.length >= 50) {
+            try {
+              // Standard PostGIS WKB for Point (Little Endian)
+              // 01 01000020 E6100000 [8 bytes Lng] [8 bytes Lat]
+              const hexToDouble = (hex: string) => {
+                const buffer = new ArrayBuffer(8);
+                const view = new DataView(buffer);
+                for (let i = 0; i < 8; i++) {
+                  view.setUint8(i, parseInt(hex.substring(i * 2, i * 2 + 2), 16));
+                }
+                return view.getFloat64(0, true);
+              };
+
+              // Extract coordinates (skip the first 18 hex chars/9 bytes)
+              lng = hexToDouble(net.location.substring(18, 34));
+              lat = hexToDouble(net.location.substring(34, 50));
+            } catch (e) {
+              console.error('WKB parse error:', e);
+            }
+          }
+          
+          // Fallback to WKT string
+          if (lat === null && net.location.startsWith('POINT')) {
+            const matches = net.location.match(/POINT\(([-\d.]+) ([-\d.]+)\)/);
+            if (matches) {
+              lng = parseFloat(matches[1]);
+              lat = parseFloat(matches[2]);
+            }
           }
         }
       }
