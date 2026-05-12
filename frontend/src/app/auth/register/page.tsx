@@ -20,6 +20,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
+import { toast } from 'sonner';
 import { MOCK_VALID_IDS, USER_TYPES } from '@/lib/auth-mock';
 
 const stepVariants = {
@@ -33,6 +34,7 @@ export default function RegisterPage() {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
@@ -52,33 +54,88 @@ export default function RegisterPage() {
   const nextStep = () => setStep((s) => s + 1);
   const prevStep = () => setStep((s) => s - 1);
 
-  const handleIdValidation = () => {
+  const handleIdValidation = async () => {
+    setLoading(true);
+    setError('');
+    
     const validIds = MOCK_VALID_IDS[formData.userType as keyof typeof MOCK_VALID_IDS];
-    if (validIds.includes(formData.idCode.toUpperCase())) {
-      setError('');
-      nextStep();
-    } else {
+    if (!validIds.includes(formData.idCode.toUpperCase())) {
       setError(`Invalid ID for ${formData.userType}. Try e.g., ${validIds[0]}`);
+      setLoading(false);
+      return;
+    }
+
+    try {
+      console.log('Checking ID uniqueness for:', formData.idCode);
+      // Real-time Database Pre-check
+      const { data, error: checkError } = await supabase
+        .from('profiles')
+        .select('id_code')
+        .eq('id_code', formData.idCode.toUpperCase())
+        .maybeSingle();
+
+      if (checkError) {
+        console.error('Database check error:', checkError);
+        throw checkError;
+      }
+
+      console.log('Database response:', data);
+
+      if (data) {
+        setFieldErrors({ idCode: 'This ID is already registered to another account.' });
+      } else {
+        console.log('ID is unique, proceeding...');
+        setFieldErrors({});
+        nextStep();
+      }
+    } catch (err: any) {
+      console.error('Validation error catch:', err);
+      toast.error('System verification failed. Please try again later.');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const sendOtp = () => {
+  const sendOtp = async () => {
     setLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      setOtpSent(true);
+    setError('');
+
+    try {
+      // Check if mobile is already in use
+      const { data, error: checkError } = await supabase
+        .from('profiles')
+        .select('mobile')
+        .eq('mobile', formData.mobile)
+        .maybeSingle();
+
+      if (checkError) throw checkError;
+
+      if (data) {
+        setFieldErrors({ mobile: 'This mobile number is already linked to an account.' });
+        setLoading(false);
+        return;
+      }
+
+      // Simulate SMS API call
+      setTimeout(() => {
+        setOtpSent(true);
+        setLoading(false);
+        toast.success('Verification code sent to ' + formData.mobile);
+      }, 1500);
+    } catch (err: any) {
+      console.error('Mobile check error:', err);
+      setError('Verification service unavailable.');
       setLoading(false);
-      setError('');
-    }, 1500);
+    }
   };
 
   const verifyOtp = () => {
     if (formData.otp === '123456') {
       setOtpVerified(true);
-      setError('');
+      toast.success('Mobile number verified successfully!');
       nextStep();
     } else {
-      setError('Invalid OTP. Use 123456 for testing.');
+      toast.error('Invalid OTP. Use 123456 for testing.');
     }
   };
 
@@ -103,11 +160,10 @@ export default function RegisterPage() {
 
       if (signUpError) throw signUpError;
 
-      // In a real app, we'd wait for email verification or handle auto-login
-      // For this demo, we'll redirect to a success state or dashboard
+      toast.success('Registration successful! Welcome to GhostNet.');
       router.push('/dashboard');
     } catch (err: any) {
-      setError(err.message);
+      toast.error(err.message);
     } finally {
       setLoading(false);
     }
@@ -213,19 +269,25 @@ export default function RegisterPage() {
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">{formData.userType.replace('_', ' ')} ID Code</label>
-                    <input 
-                      type="text" 
-                      value={formData.idCode}
-                      onChange={(e) => setFormData({...formData, idCode: e.target.value})}
-                      placeholder="e.g. FIS-101"
-                      className="w-full bg-white border border-slate-200 rounded-xl py-4 px-5 text-slate-900 focus:outline-none focus:border-marine-accent focus:ring-4 focus:ring-marine-accent/10 transition-all font-mono font-bold uppercase"
-                    />
-                    {error && (
-                      <p className="text-rose-500 text-xs flex items-center gap-1 mt-2 ml-1 font-bold">
-                        <AlertCircle size={14} /> {error}
-                      </p>
-                    )}
-                  </div>
+                      <input 
+                        type="text" 
+                        value={formData.idCode}
+                        onChange={(e) => {
+                          setFormData({...formData, idCode: e.target.value});
+                          if (fieldErrors.idCode) setFieldErrors({ ...fieldErrors, idCode: '' });
+                        }}
+                        placeholder="e.g. FIS-101"
+                        className={cn(
+                          "w-full bg-white border rounded-xl py-4 px-5 text-slate-900 focus:outline-none focus:border-marine-accent focus:ring-4 focus:ring-marine-accent/10 transition-all font-mono font-bold uppercase",
+                          fieldErrors.idCode ? "border-rose-500 ring-4 ring-rose-500/10" : "border-slate-200"
+                        )}
+                      />
+                      {fieldErrors.idCode && (
+                        <p className="text-rose-500 text-[10px] font-bold uppercase tracking-wider mt-2 ml-1 flex items-center gap-1">
+                          <AlertCircle size={12} /> {fieldErrors.idCode}
+                        </p>
+                      )}
+                    </div>
 
                   <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
                     <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-2">Notice</p>
@@ -241,10 +303,14 @@ export default function RegisterPage() {
                   </button>
                   <button 
                     onClick={handleIdValidation}
-                    disabled={!formData.idCode}
+                    disabled={loading || !formData.idCode}
                     className="flex-[2] bg-marine-accent text-white font-black py-4 rounded-xl flex items-center justify-center gap-2 hover:shadow-xl hover:shadow-marine-accent/30 transition-all active:scale-[0.98] disabled:opacity-50"
                   >
-                    Verify ID <ArrowRight size={20} />
+                    {loading ? (
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    ) : (
+                      <>Verify ID <ArrowRight size={20} /></>
+                    )}
                   </button>
                 </div>
               </motion.div>
@@ -267,10 +333,21 @@ export default function RegisterPage() {
                       <input 
                         type="tel" 
                         value={formData.mobile}
-                        onChange={(e) => setFormData({...formData, mobile: e.target.value})}
+                        onChange={(e) => {
+                          setFormData({...formData, mobile: e.target.value});
+                          if (fieldErrors.mobile) setFieldErrors({ ...fieldErrors, mobile: '' });
+                        }}
                         placeholder="+94 7X XXX XXXX"
-                        className="w-full bg-white border border-slate-200 rounded-xl py-4 px-5 text-slate-900 focus:outline-none focus:border-marine-accent transition-all font-bold"
+                        className={cn(
+                          "w-full bg-white border rounded-xl py-4 px-5 text-slate-900 focus:outline-none focus:border-marine-accent transition-all font-bold",
+                          fieldErrors.mobile ? "border-rose-500 ring-4 ring-rose-500/10" : "border-slate-200"
+                        )}
                       />
+                      {fieldErrors.mobile && (
+                        <p className="text-rose-500 text-[10px] font-bold uppercase tracking-wider mt-2 ml-1 flex items-center gap-1">
+                          <AlertCircle size={12} /> {fieldErrors.mobile}
+                        </p>
+                      )}
                     </div>
                     <button 
                       onClick={sendOtp}
@@ -295,11 +372,6 @@ export default function RegisterPage() {
                         maxLength={6}
                         className="w-full bg-white border border-slate-200 rounded-xl py-4 px-5 text-slate-900 focus:outline-none focus:border-marine-accent transition-all font-mono font-black text-center text-2xl tracking-[0.5em]"
                       />
-                      {error && (
-                        <p className="text-rose-500 text-xs flex items-center gap-1 mt-2 ml-1 font-bold">
-                          <AlertCircle size={14} /> {error}
-                        </p>
-                      )}
                     </div>
                     <button 
                       onClick={verifyOtp}
@@ -360,12 +432,8 @@ export default function RegisterPage() {
                     </div>
                   </div>
 
-                  {error && (
-                    <div className="p-4 bg-rose-50 border border-rose-100 rounded-xl flex items-center gap-3 text-rose-600 text-xs font-bold">
-                      <AlertCircle size={18} />
-                      {error}
                     </div>
-                  )}
+                  </div>
 
                   <button 
                     type="submit"
