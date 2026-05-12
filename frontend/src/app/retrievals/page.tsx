@@ -21,15 +21,11 @@ import { cn } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
 import { Lock } from "lucide-react";
 import { useRouter } from "next/navigation";
-import dynamic from "next/dynamic";
 import { calculateDistance, calculateBearing, getCardinalDirection } from "@/lib/navigation-utils";
-
-const MissionMap = dynamic(() => import("@/components/map/MissionMap"), { ssr: false });
 
 export default function RetrievalsPage() {
   const [missions, setMissions] = useState<any[]>([]);
   const [selectedMission, setSelectedMission] = useState<any>(null);
-  const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
   const [session, setSession] = useState<any>(null);
@@ -119,127 +115,101 @@ export default function RetrievalsPage() {
         <h1 className="text-3xl font-bold tracking-tight text-black">
           Retrieval Missions
         </h1>
-        <div className="flex items-center justify-between">
-          <p className="text-slate-400">
-            Manage and execute ghost net recovery operations.
-          </p>
-          <div className="bg-slate-100 p-1 rounded-xl flex border border-slate-200">
-            <button 
-              onClick={() => setViewMode('list')}
-              className={cn(
-                "px-4 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all",
-                viewMode === 'list' ? "bg-white text-marine-accent shadow-sm" : "text-slate-500 hover:text-slate-700"
-              )}
-            >
-              List View
-            </button>
-            <button 
-              onClick={() => setViewMode('map')}
-              className={cn(
-                "px-4 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all",
-                viewMode === 'map' ? "bg-white text-marine-accent shadow-sm" : "text-slate-500 hover:text-slate-700"
-              )}
-            >
-              Map View
-            </button>
-          </div>
-        </div>
+        <p className="text-slate-400">
+          Manage and execute ghost net recovery operations.
+        </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Missions View */}
-        <div className="lg:col-span-2">
-          {viewMode === 'list' ? (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-black">Open Missions</h3>
-                <div className="flex gap-2">
-                  <span className="px-2 py-1 bg-marine-100 rounded text-[10px] font-bold text-marine-700 uppercase tracking-widest">
-                    Filter: All
-                  </span>
-                </div>
-              </div>
+        <div className="lg:col-span-2 space-y-4">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-black">Open Missions</h3>
+            <div className="flex gap-2">
+              <span className="px-2 py-1 bg-marine-100 rounded text-[10px] font-bold text-marine-700 uppercase tracking-widest">
+                Filter: All
+              </span>
+            </div>
+          </div>
 
-              {missions.map((mission) => (
-                <div
-                  key={mission.id}
+          {missions.map((mission) => (
+            <div
+              key={mission.id}
+              className={cn(
+                "glass-card p-0 cursor-pointer transition-all duration-300 group hover:border-marine-accent/50 overflow-hidden",
+                selectedMission?.id === mission.id
+                  ? "border-marine-accent ring-1 ring-marine-accent/20"
+                  : "",
+              )}
+            >
+              <div className="flex">
+                <div 
                   onClick={() => setSelectedMission(mission)}
-                  className={cn(
-                    "glass-card p-5 cursor-pointer transition-all duration-300 group hover:border-marine-accent/50",
-                    selectedMission?.id === mission.id
-                      ? "border-marine-accent ring-1 ring-marine-accent/20"
-                      : "",
-                  )}
+                  className="flex-1 p-5 flex items-center justify-between"
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="flex gap-4">
-                      <div
-                        className={cn(
-                          "p-3 rounded-xl",
-                          mission.status === "ACTIVE"
-                            ? "bg-rose-500/10 text-rose-500"
-                            : "bg-amber-500/10 text-amber-500",
-                        )}
-                      >
-                        {mission.status === "ACTIVE" ? (
-                          <AlertCircle size={24} />
-                        ) : (
-                          <Activity size={24} />
-                        )}
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <h4 className="text-lg font-bold text-black uppercase">
-                            GN-{mission.id.substring(0, 5)}
-                          </h4>
-                          <span className="text-xs text-slate-500 font-mono tracking-tighter">
-                            {mission.net_type}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-3 mt-1 text-slate-400 text-sm">
-                          <span className="flex items-center gap-1">
-                            <MapPin size={14} /> {mission.area_name || `${mission.lat}, ${mission.lng}`}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Clock size={14} /> {mounted ? new Date(mission.reported_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--'}
-                          </span>
-                        </div>
-                      </div>
+                  <div className="flex gap-4">
+                    <div
+                      className={cn(
+                        "p-3 rounded-xl",
+                        mission.status === "ACTIVE"
+                          ? "bg-rose-500/10 text-rose-500"
+                          : "bg-amber-500/10 text-amber-500",
+                      )}
+                    >
+                      {mission.status === "ACTIVE" ? (
+                        <AlertCircle size={24} />
+                      ) : (
+                        <Activity size={24} />
+                      )}
                     </div>
-                    <div className="flex items-center gap-4">
-                      <div
-                        className={cn(
-                          "px-3 py-1 rounded text-[10px] font-bold uppercase tracking-widest",
-                          mission.status === "ACTIVE"
-                            ? "bg-rose-500/20 text-rose-500"
-                            : "bg-amber-500/20 text-amber-500",
-                        )}
-                      >
-                        {mission.status}
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h4 className="text-lg font-bold text-black uppercase">
+                          GN-{mission.id.substring(0, 5)}
+                        </h4>
+                        <span className="text-xs text-slate-500 font-mono tracking-tighter">
+                          {mission.net_type}
+                        </span>
                       </div>
-                      <ChevronRight
-                        size={20}
-                        className="text-slate-600 group-hover:text-marine-accent transition-colors"
-                      />
+                      <div className="flex items-center gap-3 mt-1 text-slate-400 text-sm">
+                        <span className="flex items-center gap-1">
+                          <MapPin size={14} /> {mission.area_name || `${mission.lat}, ${mission.lng}`}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Clock size={14} /> {mounted ? new Date(mission.reported_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--'}
+                        </span>
+                      </div>
                     </div>
                   </div>
+                  
+                  <div className={cn(
+                    "px-3 py-1 rounded text-[10px] font-bold uppercase tracking-widest",
+                    mission.status === "ACTIVE"
+                      ? "bg-rose-500/20 text-rose-500"
+                      : "bg-amber-500/20 text-amber-500",
+                  )}>
+                    {mission.status}
+                  </div>
                 </div>
-              ))}
-              {missions.length === 0 && !loading && (
-                <div className="py-20 text-center glass-card border-dashed opacity-50">
-                  <CheckCircle2 className="mx-auto mb-4 text-emerald-500" size={48} />
-                  <p className="text-slate-500 font-bold uppercase tracking-widest">All hazards cleared</p>
-                </div>
-              )}
+
+                {/* Navigation Action */}
+                <a
+                  href={`https://www.google.com/maps/dir/?api=1&destination=${mission.lat},${mission.lng}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-16 border-l border-slate-100 flex flex-col items-center justify-center gap-1 text-slate-400 hover:bg-marine-accent hover:text-white transition-all group/nav"
+                  title="Navigate to Hazard"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <Navigation size={20} className="group-hover/nav:animate-pulse" />
+                  <span className="text-[8px] font-black uppercase tracking-tighter">Route</span>
+                </a>
+              </div>
             </div>
-          ) : (
-            <div className="h-[700px] w-full">
-              <MissionMap 
-                missions={missions}
-                currentLocation={currentLocation}
-                selectedMission={selectedMission}
-                onSelectMission={setSelectedMission}
-              />
+          ))}
+          {missions.length === 0 && !loading && (
+            <div className="py-20 text-center glass-card border-dashed opacity-50">
+              <CheckCircle2 className="mx-auto mb-4 text-emerald-500" size={48} />
+              <p className="text-slate-500 font-bold uppercase tracking-widest">All hazards cleared</p>
             </div>
           )}
         </div>
