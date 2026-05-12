@@ -29,6 +29,19 @@ const ShipIcon = L.divIcon({
   iconAnchor: [12, 12],
 });
 
+const NetIcon = L.divIcon({
+  html: `<div class="text-rose-500 drop-shadow-md">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3v18M3 12h18M5.5 5.5l13 13M18.5 5.5l-13 13" opacity="0.3"/>
+            <circle cx="12" cy="12" r="9" stroke-width="2" />
+            <path d="M12 8v4M12 16h.01" stroke-width="3" />
+          </svg>
+        </div>`,
+  className: 'net-marker',
+  iconSize: [28, 28],
+  iconAnchor: [14, 14],
+});
+
 interface GhostNet {
   id: string;
   lat: number;
@@ -70,7 +83,9 @@ export default function GhostMap({
         .filter(net => {
           const lat = Number(net.lat);
           const lng = Number(net.lng);
-          return !isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0;
+          const isValidCoords = !isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0;
+          const isNotRetrieved = net.status !== 'RETRIEVED';
+          return isValidCoords && isNotRetrieved;
         })
         .map((net) => (
           <React.Fragment key={net.id}>
@@ -85,7 +100,10 @@ export default function GhostMap({
               dashArray: net.status === 'ACTIVE' ? '5, 10' : '0'
             }}
           />
-          <Marker position={[Number(net.lat), Number(net.lng)]}>
+            <Marker 
+              position={[Number(net.lat), Number(net.lng)]}
+              icon={NetIcon}
+            >
             <Popup className="marine-popup">
               <div className="p-1">
                 <h4 className="font-bold text-slate-900">{net.net_type || net.type}</h4>

@@ -22,15 +22,28 @@ export async function GET() {
     // Process the location data to extract lat/lng for the frontend if needed
     // Supabase returns geography as a GeoJSON string or object depending on configuration
     const processedData = data.map((net: any) => {
-      // If location is returned as a GeoJSON point
-      if (net.location && typeof net.location === 'object') {
-        return {
-          ...net,
-          lat: net.location.coordinates[1],
-          lng: net.location.coordinates[0]
-        };
+      let lat = net.lat;
+      let lng = net.lng;
+
+      // Handle PostGIS geography objects/strings
+      if (net.location) {
+        if (typeof net.location === 'object' && net.location.coordinates) {
+          lng = net.location.coordinates[0];
+          lat = net.location.coordinates[1];
+        } else if (typeof net.location === 'string' && net.location.startsWith('POINT')) {
+          const coords = net.location.match(/\((.*)\)/)?.[1].split(' ');
+          if (coords) {
+            lng = parseFloat(coords[0]);
+            lat = parseFloat(coords[1]);
+          }
+        }
       }
-      return net;
+
+      return {
+        ...net,
+        lat: lat,
+        lng: lng
+      };
     });
     
     return NextResponse.json(processedData);
