@@ -11,30 +11,28 @@ export async function GET() {
       .from('ghost_nets')
       .select(`
         *,
-        lat:location,
-        lng:location,
         reporter:profiles!reported_by(full_name, mobile, id_code)
       `)
       .order('reported_at', { ascending: false });
 
     if (error) throw error;
 
-    // Process the location data to extract lat/lng for the frontend if needed
-    // Supabase returns geography as a GeoJSON string or object depending on configuration
     const processedData = data.map((net: any) => {
-      let lat = net.lat;
-      let lng = net.lng;
+      let lat = null;
+      let lng = null;
 
-      // Handle PostGIS geography objects/strings
+      // Supabase often returns geography as a GeoJSON object in API routes
       if (net.location) {
-        if (typeof net.location === 'object' && net.location.coordinates) {
+        if (typeof net.location === 'object') {
+          // It's a GeoJSON Point: { type: "Point", coordinates: [lng, lat] }
           lng = net.location.coordinates[0];
           lat = net.location.coordinates[1];
-        } else if (typeof net.location === 'string' && net.location.startsWith('POINT')) {
-          const coords = net.location.match(/\((.*)\)/)?.[1].split(' ');
-          if (coords) {
-            lng = parseFloat(coords[0]);
-            lat = parseFloat(coords[1]);
+        } else if (typeof net.location === 'string') {
+          // It might be a WKT string like "POINT(lng lat)"
+          const matches = net.location.match(/POINT\(([-\d.]+) ([-\d.]+)\)/);
+          if (matches) {
+            lng = parseFloat(matches[1]);
+            lat = parseFloat(matches[2]);
           }
         }
       }
