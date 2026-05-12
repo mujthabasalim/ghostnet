@@ -17,6 +17,10 @@ export async function GET() {
 
     if (error) throw error;
 
+    if (data && data.length > 0) {
+      console.log('RAW DATA SAMPLE FROM SUPABASE:', JSON.stringify(data[0].location, null, 2));
+    }
+
     const processedData = data.map((net: any) => {
       let lat = null;
       let lng = null;
