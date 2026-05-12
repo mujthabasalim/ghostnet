@@ -30,7 +30,12 @@ export default function RetrievalsPage() {
   const [mounted, setMounted] = useState(false);
   const [session, setSession] = useState<any>(null);
   const [currentLocation, setCurrentLocation] = useState<{lat: number, lng: number} | null>(null);
+  const [isDevMode, setIsDevMode] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [retrievalImage, setRetrievalImage] = useState<string | null>(null);
   const router = useRouter();
+
+  const PROXIMITY_THRESHOLD = 0.54; // ~1000 meters in Nautical Miles
 
   useEffect(() => {
     setMounted(true);
@@ -88,7 +93,7 @@ export default function RetrievalsPage() {
     fetchMissions();
   }, []);
 
-  const updateStatus = async (id: string, status: string) => {
+  const updateStatus = async (id: string, status: string, additionalData: any = {}) => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       
@@ -98,14 +103,40 @@ export default function RetrievalsPage() {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${session?.access_token}`
         },
-        body: JSON.stringify({ status }),
+        body: JSON.stringify({ status, ...additionalData }),
       });
       if (res.ok) {
         fetchMissions();
         setSelectedMission(null);
+        setRetrievalImage(null);
       }
     } catch (err) {
       console.error("Error updating status:", err);
+    }
+  };
+
+  const handleImageCapture = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    try {
+      const fileName = `${Date.now()}-${file.name}`;
+      const { data, error } = await supabase.storage
+        .from('retrieval-evidence')
+        .upload(fileName, file);
+
+      if (error) throw error;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('retrieval-evidence')
+        .getPublicUrl(data.path);
+
+      setRetrievalImage(publicUrl);
+    } catch (err) {
+      console.error("Upload error:", err);
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -220,12 +251,28 @@ export default function RetrievalsPage() {
             <div className="glass-card p-6 sticky top-24 animate-in fade-in slide-in-from-bottom-4 duration-300">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-xl font-bold text-black">Mission Brief</h3>
-                <button
-                  onClick={() => setSelectedMission(null)}
-                  className="text-slate-500 hover:text-black transition-colors"
-                >
-                  Close
-                </button>
+                <div className="flex items-center gap-4">
+                  {/* Dev Simulation Toggle */}
+                  <label className="flex items-center gap-2 cursor-pointer bg-slate-100 px-2 py-1 rounded-lg border border-slate-200">
+                    <input 
+                      type="checkbox" 
+                      className="sr-only peer" 
+                      checked={isDevMode}
+                      onChange={(e) => setIsDevMode(e.target.checked)}
+                    />
+                    <div className="w-7 h-4 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-amber-500"></div>
+                    <span className="text-[8px] font-black text-slate-500 uppercase tracking-tighter">SIM</span>
+                  </label>
+                  <button
+                    onClick={() => {
+                      setSelectedMission(null);
+                      setRetrievalImage(null);
+                    }}
+                    className="text-slate-500 hover:text-black transition-colors"
+                  >
+                    Close
+                  </button>
+                </div>
               </div>
 
               <div className="space-y-6">
@@ -376,18 +423,84 @@ export default function RetrievalsPage() {
                   </button>
                 ) : (
                   <div className="space-y-4">
-                    <button 
-                      onClick={() => updateStatus(selectedMission.id, 'RETRIEVED')}
-                      disabled={!session}
-                      className={cn(
-                        "w-full font-bold py-4 rounded-xl flex items-center justify-center gap-2 transition-all",
-                        session 
-                          ? "bg-emerald-500 text-white hover:shadow-[0_0_20px_rgba(16,185,129,0.3)]" 
-                          : "bg-slate-100 text-slate-400 cursor-not-allowed"
-                      )}
-                    >
-                      {session ? 'Complete Retrieval' : 'Sign in to Complete'} <CheckCircle2 size={20} />
-                    </button>
+                    {/* Retrieval Evidence UI */}
+                    <div className="space-y-3">
+                      <h4 className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] ml-1">
+                        Retrieval Evidence
+                      </h4>
+                      <div className="relative group">
+                        {retrievalImage ? (
+                          <div className="relative rounded-2xl overflow-hidden border-2 border-emerald-500 aspect-video group">
+                            <img src={retrievalImage} alt="Evidence" className="w-full h-full object-cover" />
+                            <div className="absolute inset-0 bg-emerald-500/20 flex items-center justify-center">
+                              <CheckCircle2 className="text-white drop-shadow-lg" size={48} />
+                            </div>
+                            <button 
+                              onClick={() => setRetrievalImage(null)}
+                              className="absolute top-2 right-2 p-2 bg-black/50 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                              <Camera size={16} />
+                            </button>
+                          </div>
+                        ) : (
+                          <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50/50 hover:bg-slate-50 transition-colors cursor-pointer">
+                            <input 
+                              type="file" 
+                              accept="image/*" 
+                              capture="environment" 
+                              className="hidden" 
+                              onChange={handleImageCapture}
+                              disabled={isUploading}
+                            />
+                            {isUploading ? (
+                              <div className="flex flex-col items-center gap-2">
+                                <div className="w-6 h-6 border-2 border-marine-accent border-t-transparent rounded-full animate-spin" />
+                                <span className="text-[10px] font-black text-marine-accent uppercase">Uploading...</span>
+                              </div>
+                            ) : (
+                              <>
+                                <Camera className="text-slate-400 mb-2" size={32} />
+                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Capture Proof of Retrieval</span>
+                              </>
+                            )}
+                          </label>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Proximity Warning */}
+                    {(() => {
+                      const dist = currentLocation ? calculateDistance(
+                        currentLocation.lat, currentLocation.lng, 
+                        selectedMission.lat, selectedMission.lng
+                      ) : 999;
+                      const isOnSite = dist <= PROXIMITY_THRESHOLD;
+
+                      return (
+                        <button 
+                          onClick={() => updateStatus(selectedMission.id, 'RETRIEVED', {
+                            retrieval_image_url: retrievalImage,
+                            retrieval_lat: currentLocation?.lat,
+                            retrieval_lng: currentLocation?.lng
+                          })}
+                          disabled={!session || (!isOnSite && !isDevMode) || !retrievalImage}
+                          className={cn(
+                            "w-full font-bold py-4 rounded-xl flex items-center justify-center gap-2 transition-all",
+                            session && (isOnSite || isDevMode) && retrievalImage
+                              ? "bg-emerald-500 text-white hover:shadow-[0_0_20px_rgba(16,185,129,0.3)] shadow-lg" 
+                              : "bg-slate-100 text-slate-400 cursor-not-allowed"
+                          )}
+                        >
+                          {!retrievalImage ? (
+                            <>Evidence Required <Camera size={20} /></>
+                          ) : (!isOnSite && !isDevMode) ? (
+                            <>Too Far From Site ({dist.toFixed(1)} NM) <Anchor size={20} /></>
+                          ) : (
+                            <>Complete Retrieval <CheckCircle2 size={20} /></>
+                          )}
+                        </button>
+                      );
+                    })()}
                   </div>
                 )}
                 

@@ -14,11 +14,26 @@ export async function PUT(
     }
 
     const { id } = await params;
-    const updateData = await req.json();
+    const body = await req.json();
     
-    if (updateData.status === 'RETRIEVED') {
+    // Construct safe update object
+    const updateData: any = {
+      status: body.status,
+    };
+
+    if (body.status === 'RETRIEVED') {
       updateData.retrieved_at = new Date().toISOString();
-      updateData.retrieved_by = user.id;
+      
+      // Only include these if you've added them to your DB
+      // For now, let's store image_url as the main image if it's a retrieval proof
+      if (body.retrieval_image_url) {
+        updateData.image_url = body.retrieval_image_url;
+      }
+
+      // If you want to store notes about the retrieval location
+      if (body.retrieval_lat && body.retrieval_lng) {
+        updateData.notes = `Retrieved at: ${body.retrieval_lat}, ${body.retrieval_lng}. ${body.notes || ''}`;
+      }
     }
 
     const { data, error } = await supabaseAdmin

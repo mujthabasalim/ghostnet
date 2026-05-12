@@ -4,6 +4,7 @@ import React, { useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Circle } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { cn } from "@/lib/utils";
 
 // Fix for Leaflet marker icons in Next.js
 const DefaultIcon = L.icon({
@@ -105,11 +106,27 @@ export default function GhostMap({
               icon={NetIcon}
             >
             <Popup className="marine-popup">
-              <div className="p-1">
-                <h4 className="font-bold text-slate-900">{net.net_type || net.type}</h4>
-                <p className="text-xs text-slate-600">Area: {net.area_name || 'N/A'}</p>
-                <div className="mt-2 px-2 py-1 bg-rose-100 text-rose-700 text-[10px] font-bold rounded uppercase">
-                  {net.status}
+              <div className="p-1 min-w-[140px]">
+                <h4 className="font-bold text-slate-900 mb-0.5">{net.net_type || net.type}</h4>
+                <p className="text-[10px] text-slate-500 font-medium mb-2">Area: {net.area_name || 'N/A'}</p>
+                
+                <div className="flex flex-col gap-2">
+                  <div className={cn(
+                    "px-2 py-0.5 text-[9px] font-black rounded uppercase tracking-wider text-center",
+                    net.status === 'ACTIVE' ? "bg-rose-100 text-rose-700" : "bg-amber-100 text-amber-700"
+                  )}>
+                    {net.status}
+                  </div>
+                  
+                  <a
+                    href={`https://www.google.com/maps/dir/?api=1&destination=${net.lat},${net.lng}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 py-2 bg-marine-accent text-white rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-marine-700 transition-colors shadow-sm"
+                  >
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+                    Launch Navigation
+                  </a>
                 </div>
               </div>
             </Popup>
