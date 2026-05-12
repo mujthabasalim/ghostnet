@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { getAuthUser } from '@/lib/auth-utils';
 
 export async function GET() {
@@ -48,7 +49,7 @@ export async function POST(req: Request) {
 
     const reportData = await req.json();
     
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('ghost_nets')
       .insert([
         {

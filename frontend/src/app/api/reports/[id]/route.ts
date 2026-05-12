@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { getAuthUser } from '@/lib/auth-utils';
 
 export async function PUT(
@@ -20,7 +21,7 @@ export async function PUT(
       updateData.retrieved_by = user.id;
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('ghost_nets')
       .update(updateData)
       .eq('id', id)

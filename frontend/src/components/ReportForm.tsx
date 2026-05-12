@@ -15,14 +15,13 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { CldUploadWidget } from "next-cloudinary";
 import dynamic from "next/dynamic";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import { Lock } from "lucide-react";
 
-const MapPicker = dynamic(() => import("./map/MapPicker"), { ssr: false });
+const LocationMap = dynamic(() => import("./map/LocationMap"), { ssr: false });
 
 const stepVariants = {
   initial: { opacity: 0, x: 20 },
@@ -349,42 +348,53 @@ export default function ReportForm() {
               exit="exit"
               className="space-y-8"
             >
-              <div className="bg-slate-900/5 border-2 border-dashed border-slate-200 rounded-3xl p-8 text-center relative overflow-hidden">
+              <div className="bg-white border border-slate-200 rounded-3xl p-2 h-[300px] relative overflow-hidden shadow-sm group">
                 {isLocating ? (
-                  <div className="py-10 flex flex-col items-center gap-4">
+                  <div className="h-full flex flex-col items-center justify-center gap-4 bg-slate-50">
                     <div className="w-12 h-12 border-4 border-marine-accent/20 border-t-marine-accent rounded-full animate-spin" />
                     <p className="text-sm font-black text-slate-900 uppercase tracking-widest animate-pulse">
                       Acquiring Satellite Lock...
                     </p>
                   </div>
+                ) : formData.lat && formData.lng ? (
+                  <div className="h-full relative">
+                    <LocationMap 
+                      lat={parseFloat(formData.lat)} 
+                      lng={parseFloat(formData.lng)} 
+                    />
+                    <div className="absolute top-4 right-4 z-[1001]">
+                      <button 
+                        onClick={getLocation}
+                        className="bg-white/90 backdrop-blur-sm p-3 rounded-xl shadow-lg border border-slate-200 text-marine-accent hover:scale-105 active:scale-95 transition-all"
+                        title="Refresh Location"
+                      >
+                        <Compass size={20} className="animate-pulse" />
+                      </button>
+                    </div>
+                  </div>
                 ) : (
-                  <div className="space-y-4">
-                    <div className="w-16 h-16 bg-emerald-500/10 text-emerald-500 rounded-2xl flex items-center justify-center mx-auto mb-2">
-                      <Compass size={32} className="animate-pulse" />
-                    </div>
-                    <div>
-                      <h4 className="text-xl font-black text-slate-900">GPS Locked</h4>
-                      <p className="text-slate-500 text-sm font-medium">Hardware-verified coordinates from your device.</p>
-                    </div>
-                    <div className="flex items-center justify-center gap-8 py-4">
-                      <div className="text-center">
-                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Latitude</p>
-                        <p className="text-xl font-mono font-black text-slate-900">{formData.lat || "---"}</p>
-                      </div>
-                      <div className="w-px h-10 bg-slate-200" />
-                      <div className="text-center">
-                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Longitude</p>
-                        <p className="text-xl font-mono font-black text-slate-900">{formData.lng || "---"}</p>
-                      </div>
-                    </div>
+                  <div className="h-full flex flex-col items-center justify-center gap-4 bg-slate-50">
+                    <MapPin size={40} className="text-slate-300" />
                     <button 
                       onClick={getLocation}
-                      className="text-xs font-black text-marine-accent uppercase tracking-widest hover:underline"
+                      className="bg-marine-accent text-white px-6 py-3 rounded-xl font-bold hover:shadow-lg transition-all"
                     >
-                      Refresh GPS
+                      Initialize GPS Lock
                     </button>
                   </div>
                 )}
+              </div>
+
+              <div className="flex items-center justify-center gap-8 py-2">
+                <div className="text-center">
+                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Latitude</p>
+                  <p className="text-lg font-mono font-black text-slate-900">{formData.lat || "---"}</p>
+                </div>
+                <div className="w-px h-8 bg-slate-200" />
+                <div className="text-center">
+                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Longitude</p>
+                  <p className="text-lg font-mono font-black text-slate-900">{formData.lng || "---"}</p>
+                </div>
               </div>
 
               <div className="p-6 bg-amber-50 border border-amber-100 rounded-2xl space-y-4">
@@ -489,7 +499,7 @@ export default function ReportForm() {
                 <label className="text-xs font-black text-slate-500 uppercase tracking-[0.2em]">
                   Evidence Capture
                 </label>
-                <div className="relative">
+                <div className="flex flex-col gap-6">
                   <input
                     type="file"
                     accept="image/*"
@@ -498,38 +508,58 @@ export default function ReportForm() {
                     className="hidden"
                     id="camera-capture"
                   />
-                  <label
-                    htmlFor="camera-capture"
-                    className={cn(
-                      "w-full py-12 border-2 border-dashed rounded-3xl flex flex-col items-center justify-center gap-4 transition-all duration-500 cursor-pointer group",
-                      formData.imageUrl
-                        ? "bg-emerald-50 border-emerald-300 shadow-lg shadow-emerald-500/10"
-                        : "bg-slate-50 border-slate-200 hover:border-marine-accent/50 hover:bg-white"
-                    )}
-                  >
-                    {formData.imageUrl ? (
-                      <>
-                        <div className="p-4 bg-emerald-500/20 rounded-full">
-                          <CheckCircle2 className="text-emerald-500" size={40} />
+                  {formData.imageUrl ? (
+                    <motion.div 
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="relative w-full aspect-video rounded-3xl overflow-hidden border-4 border-white shadow-2xl group"
+                    >
+                      <img 
+                        src={formData.imageUrl} 
+                        className="w-full h-full object-cover" 
+                        alt="Captured hazard" 
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-6">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-emerald-500 rounded-full flex items-center justify-center text-white shadow-lg">
+                            <CheckCircle2 size={24} />
+                          </div>
+                          <div>
+                            <p className="text-white font-black uppercase tracking-widest text-xs">Image Verified</p>
+                            <p className="text-white/70 text-[10px] font-medium">Metadata attached for validation</p>
+                          </div>
                         </div>
-                        <span className="text-lg font-black text-emerald-700 uppercase tracking-tight">Verified Capture</span>
-                        <div className="w-32 h-20 rounded-xl overflow-hidden border border-emerald-200 shadow-sm">
-                          <img src={formData.imageUrl} className="w-full h-full object-cover" alt="Captured hazard" />
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <div className="p-4 bg-slate-200/50 rounded-full group-hover:bg-marine-accent/10 transition-colors">
-                          <Camera
-                            className="text-slate-400 group-hover:text-marine-accent transition-colors"
-                            size={40}
-                          />
-                        </div>
-                        <span className="text-lg font-bold text-slate-500 uppercase tracking-tight">Initialize Camera</span>
-                        <p className="text-xs text-slate-400 font-medium">Direct hardware capture only (Gallery disabled)</p>
-                      </>
-                    )}
-                  </label>
+                      </div>
+                      <label 
+                        htmlFor="camera-capture"
+                        className="absolute top-4 right-4 bg-white/20 backdrop-blur-md hover:bg-white/40 text-white p-3 rounded-2xl cursor-pointer transition-all border border-white/30"
+                      >
+                        <Maximize2 size={20} />
+                      </label>
+                    </motion.div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-10 bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl gap-4">
+                      <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-sm border border-slate-100">
+                        <Camera className="text-slate-300" size={32} />
+                      </div>
+                      <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">No evidence captured yet</p>
+                    </div>
+                  )}
+
+                  <div className="flex items-center justify-center">
+                    <label
+                      htmlFor="camera-capture"
+                      className={cn(
+                        "flex items-center gap-4 px-8 py-4 rounded-2xl font-black uppercase tracking-widest transition-all cursor-pointer shadow-lg active:scale-95",
+                        formData.imageUrl
+                          ? "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
+                          : "bg-marine-accent text-white hover:shadow-marine-accent/30"
+                      )}
+                    >
+                      <Camera size={24} />
+                      {formData.imageUrl ? "Retake Photo" : "Open Camera"}
+                    </label>
+                  </div>
                 </div>
               </div>
 
