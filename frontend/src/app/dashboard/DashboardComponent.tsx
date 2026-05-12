@@ -2,8 +2,13 @@
 
 import React, { useState, useEffect } from "react";
 import { AlertTriangle, CheckCircle2, Ship, Activity } from "lucide-react";
-import Map from "@/components/map";
+import dynamic from "next/dynamic";
 import { useAIS } from "@/hooks/useAIS";
+
+const Map = dynamic(() => import("@/components/map"), {
+  ssr: false,
+  loading: () => <div className="h-full w-full bg-slate-100 animate-pulse rounded-3xl" />
+});
 import { checkProximity } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 
