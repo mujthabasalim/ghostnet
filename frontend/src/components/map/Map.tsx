@@ -66,10 +66,16 @@ export default function GhostMap({
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       
-      {nets.filter(net => net.lat && net.lng).map((net) => (
-        <React.Fragment key={net.id}>
-          <Circle
-            center={[Number(net.lat), Number(net.lng)]}
+      {nets
+        .filter(net => {
+          const lat = Number(net.lat);
+          const lng = Number(net.lng);
+          return !isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0;
+        })
+        .map((net) => (
+          <React.Fragment key={net.id}>
+            <Circle
+              center={[Number(net.lat), Number(net.lng)]}
             radius={net.radius || 500}
             pathOptions={{
               color: net.status === 'ACTIVE' ? '#f43f5e' : (net.status === 'IN_PROGRESS' ? '#f59e0b' : '#10b981'),
@@ -93,12 +99,18 @@ export default function GhostMap({
         </React.Fragment>
       ))}
 
-      {vessels.filter(v => v.lat && v.lng).map((vessel) => (
-        <Marker 
-          key={vessel.id} 
-          position={[Number(vessel.lat), Number(vessel.lng)]} 
-          icon={ShipIcon}
-        >
+      {vessels
+        .filter(v => {
+          const lat = Number(v.lat);
+          const lng = Number(v.lng);
+          return !isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0;
+        })
+        .map((vessel) => (
+          <Marker 
+            key={vessel.id} 
+            position={[Number(vessel.lat), Number(vessel.lng)]} 
+            icon={ShipIcon}
+          >
           <Popup className="marine-popup">
             <div className="p-1">
               <h4 className="font-bold text-slate-900">{vessel.name}</h4>
