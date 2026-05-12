@@ -32,6 +32,17 @@ const stepVariants = {
 
 const NET_TYPES = ["Gill Net", "Trawl Net", "Drift Net", "Other"];
 
+const suggestSeaArea = (lat: number, lng: number) => {
+  let area = "Indian Ocean";
+  if (lng < 79.8) area = "Laccadive Sea";
+  else if (lng > 81.5) area = "Bay of Bengal";
+  else if (lat > 8.5 && lng < 79.9) area = "Gulf of Mannar";
+  
+  // Create a sector based on coordinate decimals for a "pro" feel
+  const sector = (Math.floor(lat * 10) % 10) + (Math.floor(lng * 10) % 10);
+  return `${area} - Zone ${sector || 1}`;
+};
+
 export default function ReportForm() {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
@@ -86,10 +97,13 @@ export default function ReportForm() {
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
         setFormData((prev) => ({
           ...prev,
-          lat: position.coords.latitude.toFixed(6),
-          lng: position.coords.longitude.toFixed(6),
+          lat: lat.toFixed(6),
+          lng: lng.toFixed(6),
+          areaName: prev.areaName || suggestSeaArea(lat, lng),
         }));
         setIsLocating(false);
       },
@@ -429,6 +443,8 @@ export default function ReportForm() {
                 </label>
                 <input
                   type="text"
+                  value={formData.areaName}
+                  onChange={(e) => setFormData({ ...formData, areaName: e.target.value })}
                   placeholder="e.g. Bay of Bengal - Sector 4"
                   className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 px-6 text-slate-900 focus:outline-none focus:border-marine-accent focus:bg-white transition-all font-bold"
                 />

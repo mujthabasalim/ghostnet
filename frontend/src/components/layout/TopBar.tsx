@@ -8,9 +8,20 @@ import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 
+const suggestSeaArea = (lat: number, lng: number) => {
+  let area = "Indian Ocean";
+  if (lng < 79.8) area = "Laccadive Sea";
+  else if (lng > 81.5) area = "Bay of Bengal";
+  else if (lat > 8.5 && lng < 79.9) area = "Gulf of Mannar";
+  const sector = (Math.floor(lat * 10) % 10) + (Math.floor(lng * 10) % 10);
+  return `${area} - Zone ${sector || 1}`;
+};
+
 export default function TopBar() {
   const [user, setUser] = useState<any>(null);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [currentLocation, setCurrentLocation] = useState<{lat: number, lng: number} | null>(null);
+  const [areaName, setAreaName] = useState<string>("Detecting Location...");
   const router = useRouter();
 
   useEffect(() => {
@@ -22,6 +33,18 @@ export default function TopBar() {
     };
 
     getUser();
+
+    // Get live location for TopBar
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition((pos) => {
+        const { latitude, longitude } = pos.coords;
+        setCurrentLocation({ lat: latitude, lng: longitude });
+        setAreaName(suggestSeaArea(latitude, longitude));
+      }, (err) => {
+        console.error("TopBar location error:", err);
+        setAreaName("Maritime Zone Unknown");
+      });
+    }
 
     const {
       data: { subscription },
@@ -62,12 +85,19 @@ export default function TopBar() {
         <div className="flex items-center gap-6">
           <NotificationCenter />
 
-          <div className="hidden lg:flex items-center gap-2 px-4 py-1.5 bg-slate-100 rounded-full border border-slate-200 text-[10px] font-black tracking-wider text-slate-600">
+          <div className="hidden lg:flex items-center gap-3 px-4 py-1.5 bg-slate-100 rounded-full border border-slate-200 text-[10px] font-black tracking-wider text-slate-600 shadow-sm">
             <Compass
               size={14}
-              className="animate-spin duration-4000 text-marine-accent"
+              className={cn("text-marine-accent", currentLocation ? "animate-pulse" : "animate-spin")}
             />
-            <span>7.8731° N, 80.7718° E</span>
+            <div className="flex flex-col items-start leading-none gap-0.5">
+              <span className="text-slate-900 uppercase">{areaName}</span>
+              {currentLocation && (
+                <span className="text-slate-400 font-bold opacity-70">
+                  {currentLocation.lat.toFixed(4)}° N, {currentLocation.lng.toFixed(4)}° E
+                </span>
+              )}
+            </div>
           </div>
 
           <div className="flex items-center gap-4 pl-6 border-l border-slate-100">
