@@ -11,7 +11,8 @@ export async function GET() {
       .from('ghost_nets')
       .select(`
         *,
-        reporter:profiles!reported_by(full_name, mobile, id_code)
+        reporter:profiles!reported_by(full_name, mobile, id_code),
+        retriever:profiles!retrieved_by(full_name, id_code)
       `)
       .order('reported_at', { ascending: false });
 
