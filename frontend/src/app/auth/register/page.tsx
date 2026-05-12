@@ -153,7 +153,7 @@ export default function RegisterPage() {
             full_name: formData.fullName,
             mobile: formData.mobile,
             user_type: formData.userType,
-            id_code: formData.idCode,
+            id_code: formData.idCode.toUpperCase(),
           }
         }
       });
