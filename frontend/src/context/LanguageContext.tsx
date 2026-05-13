@@ -161,6 +161,12 @@ export const dictionary: Translations = {
   
   // Messages
   profile_updated: { en: 'Profile updated successfully!', ml: 'പ്രൊഫൈൽ വിജയകരമായി പുതുക്കി!', ta: 'சுயவிவரம் வெற்றிகரமாக புதுப்பிக்கப்பட்டது!', hi: 'प्रोफ़ाइल सफलतापूर्वक अपडेट की गई!' },
+  verify_otp: { en: 'Verify OTP', ml: 'OTP പരിശോധിക്കുക', ta: 'OTP ஐ சரிபார்க்கவும்', hi: 'ओटीपी सत्यापित करें' },
+  enter_otp: { en: 'Enter the 6-digit code sent to your mobile', ml: 'നിങ്ങളുടെ മൊബൈലിലേക്ക് അയച്ച 6 അക്ക കോഡ് നൽകുക', ta: 'உங்கள் கைபேசிக்கு அனுப்பப்பட்ட 6 இலக்கக் குறியீட்டை உள்ளிடவும்', hi: 'अपने मोबाइल पर भेजा गया 6-अंकीय कोड दर्ज करें' },
+  otp_sent: { en: 'Verification code sent!', ml: 'പരിശോധനാ കോഡ് അയച്ചു!', ta: 'சரிபார்ப்புக் குறியீடு அனுப்பப்பட்டது!', hi: 'सत्यापन कोड भेजा गया!' },
+  resend_otp: { en: 'Resend OTP', ml: 'വീണ്ടും അയക്കുക', ta: 'OTP ஐ மீண்டும் அனுப்பவும்', hi: 'ओटीपी पुनः भेजें' },
+  invalid_otp: { en: 'Invalid verification code', ml: 'അസാധുവായ കോഡ്', ta: 'தவறான சரிபார்ப்புக் குறியீடு', hi: 'अमान्य सत्यापन कोड' },
+  email_verification_sent: { en: 'Verification email sent to your new address.', ml: 'പുതിയ വിലാസത്തിലേക്ക് ഇമെയിൽ അയച്ചു.', ta: 'உங்கள் புதிய முகவரிக்கு சரிபார்ப்பு மின்னஞ்சல் அனுப்பப்பட்டது.', hi: 'आपके नए पते पर सत्यापन ईमेल भेजा गया।' },
   welcome_back: { en: 'Welcome back', ml: 'വീണ്ടും സ്വാഗതം', ta: 'மீண்டும் வருக', hi: 'वापसी पर स्वागत है' }
 };
 

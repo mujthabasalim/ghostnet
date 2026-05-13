@@ -13,8 +13,12 @@ export default function SettingsPage() {
   const [user, setUser] = useState<any>(null);
   const [formData, setFormData] = useState({
     fullName: '',
-    mobile: ''
+    mobile: '',
+    email: ''
   });
+  const [showOtpModal, setShowOtpModal] = useState(false);
+  const [otp, setOtp] = useState('');
+  const [verifying, setVerifying] = useState(false);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -23,7 +27,8 @@ export default function SettingsPage() {
         setUser(session.user);
         setFormData({
           fullName: session.user.user_metadata?.full_name || '',
-          mobile: session.user.user_metadata?.mobile || ''
+          mobile: session.user.user_metadata?.mobile || '',
+          email: session.user.email || ''
         });
       }
     };
@@ -35,8 +40,21 @@ export default function SettingsPage() {
     setLoading(true);
 
     try {
-      // 1. Update Auth Metadata
+      const { data: { session } } = await supabase.auth.getSession();
+      const currentMobile = session?.user?.user_metadata?.mobile;
+      const currentEmail = session?.user?.email;
+
+      // 1. Check for Mobile Change (MOCK OTP)
+      if (formData.mobile !== currentMobile && formData.mobile.length > 5) {
+        setShowOtpModal(true);
+        toast.info("MOCK: Verification code sent! (Use 123456)");
+        setLoading(false);
+        return;
+      }
+
+      // 2. Update Auth (Full Name & Mobile in Metadata, Email at top level)
       const { error: authError } = await supabase.auth.updateUser({
+        email: formData.email,
         data: { 
           full_name: formData.fullName,
           mobile: formData.mobile
@@ -45,7 +63,7 @@ export default function SettingsPage() {
 
       if (authError) throw authError;
 
-      // 2. Update Public Profiles Table
+      // 3. Update Public Profiles Table (Skip email as it is in auth.users)
       const { error: profileError } = await supabase
         .from('profiles')
         .update({ 
@@ -61,6 +79,37 @@ export default function SettingsPage() {
       toast.error(error.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    setVerifying(true);
+    try {
+      // MOCK OTP Verification
+      if (otp !== '123456') {
+        throw new Error(t('invalid_otp'));
+      }
+
+      // Update Auth Metadata & Profile Table directly
+      const { error: authError } = await supabase.auth.updateUser({
+        data: { mobile: formData.mobile }
+      });
+      if (authError) throw authError;
+
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({ mobile: formData.mobile })
+        .eq('id', user.id);
+
+      if (profileError) throw profileError;
+
+      toast.success(t('profile_updated'));
+      setShowOtpModal(false);
+      setOtp('');
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setVerifying(false);
     }
   };
 
@@ -155,10 +204,23 @@ export default function SettingsPage() {
                 </div>
               </div>
 
-              <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100 space-y-2">
-                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('email_address')}</p>
-                 <p className="text-sm font-bold text-slate-900 opacity-60">{user?.email}</p>
-                 <p className="text-[9px] text-slate-400 font-medium italic mt-2">{t('email_change_note')}</p>
+              <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100 space-y-4">
+                 <div className="space-y-2">
+                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
+                     {t('email_address')}
+                   </label>
+                   <div className="relative">
+                     <Globe className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                     <input
+                       type="email"
+                       value={formData.email}
+                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                       className="w-full bg-white border border-slate-200 rounded-2xl py-3.5 pl-12 pr-4 text-sm font-bold focus:outline-none focus:border-marine-accent transition-all"
+                       placeholder="e.g. salim@ghostnet.org"
+                     />
+                   </div>
+                 </div>
+                 <p className="text-[9px] text-slate-400 font-medium italic">{t('email_change_note')}</p>
               </div>
             </div>
 
@@ -198,6 +260,66 @@ export default function SettingsPage() {
           </div>
         </div>
       </div>
+
+      {/* OTP Verification Modal */}
+      <AnimatePresence>
+        {showOtpModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowOtpModal(false)}
+              className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              className="relative w-full max-w-sm bg-white rounded-[2.5rem] p-8 shadow-2xl border border-slate-100"
+            >
+              <div className="text-center space-y-6">
+                <div className="w-16 h-16 bg-marine-accent/10 rounded-2xl flex items-center justify-center text-marine-accent mx-auto">
+                  <Phone size={32} />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-black text-slate-900 tracking-tight">{t('verify_otp')}</h3>
+                  <p className="text-sm text-slate-500 font-medium mt-2">{t('enter_otp')}</p>
+                </div>
+
+                <div className="relative">
+                  <input
+                    type="text"
+                    maxLength={6}
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-5 text-center text-3xl font-black tracking-[0.5em] text-slate-900 focus:outline-none focus:border-marine-accent transition-all"
+                    placeholder="------"
+                  />
+                </div>
+
+                <div className="pt-2 space-y-3">
+                  <button
+                    onClick={handleVerifyOtp}
+                    disabled={otp.length !== 6 || verifying}
+                    className="w-full py-4 bg-slate-900 text-white rounded-2xl font-black uppercase tracking-widest hover:bg-slate-800 transition-all disabled:opacity-50 active:scale-95"
+                  >
+                    {verifying ? (
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto" />
+                    ) : t('verify_otp')}
+                  </button>
+                  <button
+                    onClick={() => setShowOtpModal(false)}
+                    className="w-full py-4 text-slate-400 font-black uppercase tracking-widest text-[10px] hover:text-slate-600 transition-colors"
+                  >
+                    {t('cancel')}
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
