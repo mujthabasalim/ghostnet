@@ -301,6 +301,7 @@ export default function SettingsPage() {
                     />
                     <input
                       type="email"
+                      readOnly
                       value={formData.email}
                       onChange={(e) =>
                         setFormData({ ...formData, email: e.target.value })
@@ -333,8 +334,6 @@ export default function SettingsPage() {
               </button>
             </div>
           </form>
-
-
         </div>
       </div>
 
