@@ -74,7 +74,14 @@ export default function SettingsPage() {
 
       if (profileError) throw profileError;
 
-      toast.success(t('profile_updated'));
+      const { data: { session: updatedSession } } = await supabase.auth.getSession();
+      const emailChanged = formData.email !== updatedSession?.user?.email;
+
+      if (emailChanged) {
+        toast.success(t('profile_updated') + " - " + t('email_verification_sent'));
+      } else {
+        toast.success(t('profile_updated'));
+      }
     } catch (error: any) {
       toast.error(error.message);
     } finally {
