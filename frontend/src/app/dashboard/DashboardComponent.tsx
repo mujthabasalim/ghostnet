@@ -147,7 +147,7 @@ export default function DashboardComponent() {
 
       <motion.div
         variants={itemVariants}
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6"
       >
         {stats.map((stat) => {
           const Icon = stat.icon;
@@ -155,18 +155,18 @@ export default function DashboardComponent() {
             <motion.div
               key={stat.name}
               whileHover={{ y: -5, scale: 1.02 }}
-              className="glass-card p-6 flex items-center gap-4 hover:shadow-2xl hover:shadow-marine-accent/10 transition-all duration-500 group border-white/60"
+              className="glass-card p-4 sm:p-6 flex items-center gap-3 sm:gap-4 hover:shadow-2xl hover:shadow-marine-accent/10 transition-all duration-500 group border-white/60 min-w-0"
             >
               <div
-                className={`p-4 rounded-2xl ${stat.bg} ${stat.color} group-hover:scale-110 transition-transform shadow-sm`}
+                className={`p-3 sm:p-4 rounded-2xl ${stat.bg} ${stat.color} group-hover:scale-110 transition-transform shadow-sm shrink-0`}
               >
-                <Icon size={28} />
+                <Icon className="w-6 h-6 sm:w-7 sm:h-7" />
               </div>
-              <div>
-                <p className="text-sm font-bold text-slate-500 uppercase tracking-wider">
+              <div className="min-w-0">
+                <p className="text-xs sm:text-sm font-bold text-slate-500 uppercase tracking-wider truncate">
                   {stat.name}
                 </p>
-                <p className="text-3xl font-black text-slate-900 tracking-tight">
+                <p className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight truncate">
                   {stat.value}
                 </p>
               </div>
@@ -175,29 +175,29 @@ export default function DashboardComponent() {
         })}
       </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
         <motion.div
           variants={itemVariants}
-          className="lg:col-span-2 glass-card min-h-[600px] overflow-hidden relative border-white/60 shadow-2xl"
+          className="lg:col-span-2 glass-card min-h-[400px] sm:min-h-[600px] overflow-hidden relative border-white/60 shadow-2xl flex flex-col"
         >
-          <div className="absolute top-6 left-6 z-10 flex gap-3">
-            <div className="px-4 py-2 bg-white/80 backdrop-blur-md rounded-full text-sm font-bold text-slate-900 flex items-center gap-2 shadow-lg border border-white/50">
-              <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
-              {t('live_ais_feed')}
+          <div className="absolute top-4 sm:top-6 left-4 sm:left-6 z-10 flex gap-3">
+            <div className="px-3 sm:px-4 py-1.5 sm:py-2 bg-white/80 backdrop-blur-md rounded-full text-xs sm:text-sm font-bold text-slate-900 flex items-center gap-2 shadow-lg border border-white/50">
+              <div className="w-2 sm:w-2.5 h-2 sm:h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)] shrink-0" />
+              <span>{t('live_ais_feed')}</span>
             </div>
           </div>
 
-          <div className="w-full h-full">
+          <div className="w-full flex-1 min-h-[350px]">
             <Map nets={nets} vessels={vessels} />
           </div>
         </motion.div>
 
-        <motion.div variants={itemVariants} className="space-y-6">
-          <div className="glass-card p-6 border-white/60">
-            <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+        <motion.div variants={itemVariants} className="space-y-6 min-w-0">
+          <div className="glass-card p-4 sm:p-6 border-white/60 min-w-0">
+            <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-4 sm:mb-6 flex items-center gap-2">
               {t('alerts')}
             </h3>
-            <div className="space-y-4 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar">
+            <div className="space-y-3 sm:space-y-4 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar min-w-0">
               <AnimatePresence>
                 {alerts.length > 0 ? (
                   alerts.map((alert, i) => (
@@ -206,17 +206,17 @@ export default function DashboardComponent() {
                       initial={{ opacity: 0, x: 20 }}
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: -20 }}
-                      className="p-4 bg-rose-50 border border-rose-100 rounded-2xl flex gap-4"
+                      className="p-3 sm:p-4 bg-rose-50 border border-rose-100 rounded-2xl flex gap-3 sm:gap-4 min-w-0"
                     >
                       <AlertTriangle
-                        className="text-rose-500 shrink-0"
-                        size={20}
+                        className="text-rose-500 shrink-0 mt-0.5"
+                        size={18}
                       />
-                      <div>
-                        <p className="text-sm font-bold text-rose-900 uppercase tracking-tight">
+                      <div className="min-w-0">
+                        <p className="text-xs sm:text-sm font-bold text-rose-900 uppercase tracking-tight truncate">
                           Danger: Entanglement Risk
                         </p>
-                        <p className="text-sm text-rose-700 mt-1">
+                        <p className="text-[11px] sm:text-xs text-rose-700 mt-1 break-words">
                           Vessel{" "}
                           <span className="font-black">
                             "{alert.vesselName}"
@@ -227,12 +227,11 @@ export default function DashboardComponent() {
                     </motion.div>
                   ))
                 ) : (
-                  <div className="py-20 text-center opacity-40">
+                  <div className="py-12 sm:py-20 text-center opacity-40">
                     <CheckCircle2
-                      className="mx-auto mb-4 text-emerald-500"
-                      size={32}
+                      className="mx-auto mb-3 sm:mb-4 text-emerald-500 w-8 h-8 sm:w-10 sm:h-10"
                     />
-                    <p className="text-xs uppercase tracking-[0.2em] font-black text-slate-900">
+                    <p className="text-[10px] sm:text-xs uppercase tracking-[0.2em] font-black text-slate-900">
                       {t('no_critical_threats')}
                     </p>
                   </div>
@@ -241,34 +240,34 @@ export default function DashboardComponent() {
             </div>
           </div>
 
-          <div className="glass-card p-6 border-white/60">
-            <h3 className="text-xl font-bold text-slate-900 mb-6">
+          <div className="glass-card p-4 sm:p-6 border-white/60 min-w-0">
+            <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-4 sm:mb-6">
               {t('active_missions')}
             </h3>
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4 min-w-0">
               {nets
                 .filter((n) => n.status === "IN_PROGRESS")
                 .slice(0, 3)
                 .map((net) => (
                   <div
                     key={net.id}
-                    className="p-4 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-between hover:bg-white transition-colors cursor-pointer"
+                    className="p-3 sm:p-4 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-between gap-2 hover:bg-white transition-colors cursor-pointer min-w-0"
                   >
-                    <div>
-                      <p className="text-sm font-bold text-slate-900">
+                    <div className="min-w-0">
+                      <p className="text-xs sm:text-sm font-bold text-slate-900 truncate">
                         Retrieval GN-{net.id.substring(0, 5)}
                       </p>
-                      <p className="text-xs text-slate-500 mt-1 font-medium">
+                      <p className="text-[10px] sm:text-xs text-slate-500 mt-0.5 sm:mt-1 font-medium truncate">
                         Team: {net.team || "Coastal Divers"}
                       </p>
                     </div>
-                    <div className="px-3 py-1 bg-amber-100 text-amber-700 text-[10px] font-black uppercase tracking-widest rounded-full">
+                    <div className="px-2.5 py-1 bg-amber-100 text-amber-700 text-[9px] sm:text-[10px] font-black uppercase tracking-widest rounded-full shrink-0">
                       In Progress
                     </div>
                   </div>
                 ))}
               {nets.filter((n) => n.status === "IN_PROGRESS").length === 0 && (
-                <p className="text-center py-10 text-xs text-slate-400 font-bold uppercase tracking-widest opacity-50">
+                <p className="text-center py-8 sm:py-10 text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-widest opacity-50">
                   No active missions
                 </p>
               )}

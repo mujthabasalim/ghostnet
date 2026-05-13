@@ -181,11 +181,11 @@ export default function ReportForm() {
   return (
     <div className="max-w-3xl mx-auto">
       <div className="mb-10">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-3xl font-black text-slate-900 tracking-tight">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-4 mb-4">
+          <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
             {t('report_lost_net')}
           </h2>
-          <span className="text-sm text-slate-400 font-bold uppercase tracking-widest">
+          <span className="text-xs sm:text-sm text-slate-400 font-bold uppercase tracking-widest">
             {t('step_1_of_3').replace('1', step.toString())}
           </span>
         </div>
@@ -199,9 +199,9 @@ export default function ReportForm() {
         </div>
       </div>
 
-      <div className="glass-card p-10 min-h-[500px] flex flex-col relative overflow-hidden">
+      <div className="glass-card p-5 sm:p-10 min-h-[500px] flex flex-col relative overflow-hidden">
         {!session && (
-          <div className="absolute inset-0 z-50 bg-white/60 backdrop-blur-md flex flex-col items-center justify-center p-10 text-center">
+          <div className="absolute inset-0 z-50 bg-white/60 backdrop-blur-md flex flex-col items-center justify-center p-5 sm:p-10 text-center">
             <div className="w-20 h-20 bg-marine-accent/10 rounded-full flex items-center justify-center text-marine-accent mb-6 border border-marine-accent/20">
               <Lock size={40} />
             </div>
@@ -245,7 +245,7 @@ export default function ReportForm() {
               </div>
                 <button
                 onClick={() => (window.location.href = "/dashboard")}
-                className="bg-slate-900 text-white px-10 py-4 rounded-2xl font-bold text-lg hover:bg-slate-800 transition-all shadow-xl hover:shadow-2xl hover:scale-105"
+                className="w-full sm:w-auto bg-slate-900 text-white px-8 sm:px-10 py-4 rounded-2xl font-bold text-base sm:text-lg hover:bg-slate-800 transition-all shadow-xl hover:shadow-2xl hover:scale-105"
               >
                 {t('return_dashboard')}
               </button>
@@ -259,7 +259,7 @@ export default function ReportForm() {
               exit="exit"
               className="space-y-8"
             >
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                 <div className="space-y-3">
                   <label className="text-xs font-black text-slate-500 uppercase tracking-[0.2em]">
                     {t('net_type')}
@@ -273,7 +273,7 @@ export default function ReportForm() {
                           setFormData({ ...formData, netType: type })
                         }
                         className={cn(
-                          "py-4 px-4 rounded-2xl text-sm font-bold border transition-all duration-300",
+                          "py-3 sm:py-4 px-2 sm:px-4 rounded-2xl text-xs sm:text-sm font-bold border transition-all duration-300",
                           formData.netType === type
                             ? "bg-marine-accent border-marine-accent text-white shadow-lg shadow-marine-accent/20 scale-105"
                             : "bg-slate-50 border-slate-200 text-slate-600 hover:border-marine-accent/50 hover:bg-white",
@@ -298,7 +298,7 @@ export default function ReportForm() {
                       setFormData({ ...formData, length: e.target.value })
                     }
                     placeholder="e.g. 500"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 px-6 text-slate-900 focus:outline-none focus:border-marine-accent focus:bg-white focus:ring-4 focus:ring-marine-accent/10 transition-all font-bold"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3 sm:py-4 px-4 sm:px-6 text-slate-900 focus:outline-none focus:border-marine-accent focus:bg-white focus:ring-4 focus:ring-marine-accent/10 transition-all font-bold text-sm sm:text-base"
                   />
                   {formData.length && (
                     <motion.p
@@ -313,7 +313,7 @@ export default function ReportForm() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                 <div className="space-y-3">
                   <label className="text-xs font-black text-slate-500 uppercase tracking-[0.2em]">
                     {t('float_color')}
@@ -325,7 +325,7 @@ export default function ReportForm() {
                       setFormData({ ...formData, floatColor: e.target.value })
                     }
                     placeholder="e.g. Neon Orange"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 px-6 text-slate-900 focus:outline-none focus:border-marine-accent focus:bg-white focus:ring-4 focus:ring-marine-accent/10 transition-all font-bold"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3 sm:py-4 px-4 sm:px-6 text-slate-900 focus:outline-none focus:border-marine-accent focus:bg-white focus:ring-4 focus:ring-marine-accent/10 transition-all font-bold text-sm sm:text-base"
                   />
                 </div>
                 <div className="space-y-3">
@@ -339,20 +339,20 @@ export default function ReportForm() {
                       setFormData({ ...formData, floatDesc: e.target.value })
                     }
                     placeholder="e.g. Large blue buoy with white stripe"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 px-6 text-slate-900 focus:outline-none focus:border-marine-accent focus:bg-white focus:ring-4 focus:ring-marine-accent/10 transition-all font-bold"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3 sm:py-4 px-4 sm:px-6 text-slate-900 focus:outline-none focus:border-marine-accent focus:bg-white focus:ring-4 focus:ring-marine-accent/10 transition-all font-bold text-sm sm:text-base"
                   />
                 </div>
               </div>
 
-              <div className="flex justify-end pt-10">
+              <div className="flex justify-end pt-6 sm:pt-10">
                 <button
                   onClick={nextStep}
-                  className="bg-marine-accent text-white font-black px-10 py-4 rounded-2xl flex items-center gap-3 hover:shadow-2xl hover:shadow-marine-accent/30 transition-all hover:scale-105 active:scale-95 group"
+                  className="w-full sm:w-auto justify-center bg-marine-accent text-white font-black px-6 sm:px-10 py-4 rounded-2xl flex items-center gap-3 hover:shadow-2xl hover:shadow-marine-accent/30 transition-all hover:scale-105 active:scale-95 group text-sm sm:text-base"
                 >
-                  {t('next_step')}: {t('location_details')}{" "}
+                  <span>{t('next_step')}: {t('location_details')}</span>
                   <ArrowRight
                     size={22}
-                    className="group-hover:translate-x-1 transition-transform"
+                    className="group-hover:translate-x-1 transition-transform shrink-0"
                   />
                 </button>
               </div>
@@ -415,18 +415,18 @@ export default function ReportForm() {
                 </div>
               </div>
 
-              <div className="p-6 bg-amber-50 border border-amber-100 rounded-2xl space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-amber-500/20 text-amber-600 rounded-lg">
+              <div className="p-4 sm:p-6 bg-amber-50 border border-amber-100 rounded-2xl">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="flex items-start sm:items-center gap-3">
+                    <div className="p-2 bg-amber-500/20 text-amber-600 rounded-lg shrink-0 mt-0.5 sm:mt-0">
                       <AlertCircle size={18} />
                     </div>
                     <div>
-                      <p className="text-sm font-black text-amber-900 uppercase tracking-tight">{t('spatial_integrity')}</p>
-                      <p className="text-xs text-amber-700 font-medium">{t('spatial_integrity_msg')}</p>
+                      <p className="text-xs sm:text-sm font-black text-amber-900 uppercase tracking-tight">{t('spatial_integrity')}</p>
+                      <p className="text-[11px] sm:text-xs text-amber-700 font-medium">{t('spatial_integrity_msg')}</p>
                     </div>
                   </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
+                  <label className="relative inline-flex items-center cursor-pointer self-end sm:self-auto shrink-0">
                     <input 
                       type="checkbox" 
                       className="sr-only peer" 
@@ -450,25 +450,25 @@ export default function ReportForm() {
                   value={formData.areaName}
                   onChange={(e) => setFormData({ ...formData, areaName: e.target.value })}
                   placeholder={t('eg_bay_of_bengal')}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 px-6 text-slate-900 focus:outline-none focus:border-marine-accent focus:bg-white transition-all font-bold"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3 sm:py-4 px-4 sm:px-6 text-slate-900 focus:outline-none focus:border-marine-accent focus:bg-white transition-all font-bold text-sm sm:text-base"
                 />
               </div>
 
-              <div className="flex justify-between pt-10">
+              <div className="flex flex-col-reverse sm:flex-row justify-between gap-4 pt-6 sm:pt-10">
                 <button
                   onClick={prevStep}
-                  className="text-slate-400 font-black px-10 py-4 rounded-2xl flex items-center gap-3 hover:bg-slate-100 transition-all"
+                  className="w-full sm:w-auto justify-center text-slate-400 font-black px-6 sm:px-10 py-4 rounded-2xl flex items-center gap-3 hover:bg-slate-100 transition-all text-sm sm:text-base"
                 >
-                  <ChevronLeft size={22} /> {t('back')}
+                  <ChevronLeft size={22} /> <span>{t('back')}</span>
                 </button>
                 <button
                   onClick={nextStep}
-                  className="bg-marine-accent text-white font-black px-10 py-4 rounded-2xl flex items-center gap-3 hover:shadow-2xl hover:shadow-marine-accent/30 transition-all hover:scale-105 active:scale-95 group"
+                  className="w-full sm:w-auto justify-center bg-marine-accent text-white font-black px-6 sm:px-10 py-4 rounded-2xl flex items-center gap-3 hover:shadow-2xl hover:shadow-marine-accent/30 transition-all hover:scale-105 active:scale-95 group text-sm sm:text-base"
                 >
-                  {t('next_step')}: {t('additional_info')}{" "}
+                  <span>{t('next_step')}: {t('additional_info')}</span>
                   <ArrowRight
                     size={22}
-                    className="group-hover:translate-x-1 transition-transform"
+                    className="group-hover:translate-x-1 transition-transform shrink-0"
                   />
                 </button>
               </div>
@@ -482,7 +482,7 @@ export default function ReportForm() {
               exit="exit"
               className="space-y-8"
             >
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                 <div className="space-y-3">
                   <label className="text-xs font-black text-slate-500 uppercase tracking-[0.2em]">
                     {t('estimated_depth')}
@@ -493,7 +493,7 @@ export default function ReportForm() {
                     onChange={(e) =>
                       setFormData({ ...formData, depth: e.target.value })
                     }
-                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 px-6 text-slate-900 focus:outline-none focus:border-marine-accent font-bold"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3 sm:py-4 px-4 sm:px-6 text-slate-900 focus:outline-none focus:border-marine-accent font-bold text-sm sm:text-base"
                   />
                 </div>
                 <div className="space-y-3">
@@ -505,7 +505,7 @@ export default function ReportForm() {
                     onChange={(e) =>
                       setFormData({ ...formData, weather: e.target.value })
                     }
-                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 px-6 text-slate-900 focus:outline-none focus:border-marine-accent font-bold cursor-pointer"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3 sm:py-4 px-4 sm:px-6 text-slate-900 focus:outline-none focus:border-marine-accent font-bold cursor-pointer text-sm sm:text-base"
                   >
                     <option>{t('calm')}</option>
                     <option>{t('rough')}</option>
@@ -539,14 +539,14 @@ export default function ReportForm() {
                         className="w-full h-full object-cover" 
                         alt="Captured hazard" 
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-6">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-emerald-500 rounded-full flex items-center justify-center text-white shadow-lg">
-                            <CheckCircle2 size={24} />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4 sm:p-6">
+                        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                          <div className="w-8 h-8 sm:w-10 sm:h-10 bg-emerald-500 rounded-full flex items-center justify-center text-white shadow-lg shrink-0">
+                            <CheckCircle2 className="w-4 h-4 sm:w-6 sm:h-6" />
                           </div>
-                          <div>
-                            <p className="text-white font-black uppercase tracking-widest text-xs">{t('image_verified')}</p>
-                            <p className="text-white/70 text-[10px] font-medium">{t('metadata_attached')}</p>
+                          <div className="min-w-0">
+                            <p className="text-white font-black uppercase tracking-widest text-[11px] sm:text-xs truncate">{t('image_verified')}</p>
+                            <p className="text-white/70 text-[9px] sm:text-[10px] font-medium truncate">{t('metadata_attached')}</p>
                           </div>
                         </div>
                       </div>
@@ -558,26 +558,26 @@ export default function ReportForm() {
                       </label>
                     </motion.div>
                   ) : (
-                    <div className="flex flex-col items-center justify-center py-10 bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl gap-4">
+                    <div className="flex flex-col items-center justify-center py-10 bg-slate-50 border-2 border-dashed border-slate-200 px-4 text-center rounded-3xl gap-4">
                       <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-sm border border-slate-100">
                         <Camera className="text-slate-300" size={32} />
                       </div>
-                      <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">{t('no_evidence')}</p>
+                      <p className="text-xs sm:text-sm font-bold text-slate-400 uppercase tracking-widest">{t('no_evidence')}</p>
                     </div>
                   )}
 
-                  <div className="flex items-center justify-center">
+                  <div className="flex items-center justify-center w-full">
                     <label
                       htmlFor="camera-capture"
                       className={cn(
-                        "flex items-center gap-4 px-8 py-4 rounded-2xl font-black uppercase tracking-widest transition-all cursor-pointer shadow-lg active:scale-95",
+                        "flex items-center justify-center gap-3 w-full sm:w-auto px-6 sm:px-8 py-4 rounded-2xl font-black uppercase tracking-widest transition-all cursor-pointer shadow-lg active:scale-95 text-xs sm:text-sm",
                         formData.imageUrl
                           ? "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
                           : "bg-marine-accent text-white hover:shadow-marine-accent/30"
                       )}
                     >
-                      <Camera size={24} />
-                      {formData.imageUrl ? t('retake_photo') : t('open_camera')}
+                      <Camera size={24} className="shrink-0" />
+                      <span className="truncate">{formData.imageUrl ? t('retake_photo') : t('open_camera')}</span>
                     </label>
                   </div>
                 </div>
@@ -593,7 +593,7 @@ export default function ReportForm() {
                   onChange={(e) =>
                     setFormData({ ...formData, notes: e.target.value })
                   }
-                  className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 px-6 text-slate-900 focus:outline-none focus:border-marine-accent focus:bg-white transition-all font-medium"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3 sm:py-4 px-4 sm:px-6 text-slate-900 focus:outline-none focus:border-marine-accent focus:bg-white transition-all font-medium text-sm sm:text-base"
                   placeholder={t('notes_placeholder')}
                 />
               </div>
@@ -608,27 +608,27 @@ export default function ReportForm() {
                 </motion.p>
               )}
 
-              <div className="flex justify-between pt-10">
+              <div className="flex flex-col-reverse sm:flex-row justify-between gap-4 pt-6 sm:pt-10">
                 <button
                   onClick={prevStep}
                   disabled={loading}
-                  className="text-slate-400 font-black px-10 py-4 rounded-2xl flex items-center gap-3 hover:bg-slate-100 transition-all disabled:opacity-50"
+                  className="w-full sm:w-auto justify-center text-slate-400 font-black px-6 sm:px-10 py-4 rounded-2xl flex items-center gap-3 hover:bg-slate-100 transition-all disabled:opacity-50 text-sm sm:text-base"
                 >
-                  <ChevronLeft size={22} /> {t('back')}
+                  <ChevronLeft size={22} /> <span>{t('back')}</span>
                 </button>
                 <button
                   onClick={handleSubmit}
                   disabled={loading}
-                  className="bg-emerald-500 text-white font-black px-12 py-4 rounded-2xl flex items-center gap-3 hover:shadow-2xl hover:shadow-emerald-500/30 transition-all hover:scale-105 active:scale-95 disabled:opacity-70 disabled:scale-100"
+                  className="w-full sm:w-auto justify-center bg-emerald-500 text-white font-black px-6 sm:px-12 py-4 rounded-2xl flex items-center gap-3 hover:shadow-2xl hover:shadow-emerald-500/30 transition-all hover:scale-105 active:scale-95 disabled:opacity-70 disabled:scale-100 text-sm sm:text-base"
                 >
                   {loading ? (
                     <>
-                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      {t('transmitting')}
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin shrink-0" />
+                      <span>{t('transmitting')}</span>
                     </>
                   ) : (
                     <>
-                      {t('submit_hazard_report')} <CheckCircle2 size={22} />
+                      <span>{t('submit_hazard_report')}</span> <CheckCircle2 size={22} className="shrink-0" />
                     </>
                   )}
                 </button>
