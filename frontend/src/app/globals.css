@@ -53,12 +53,44 @@
   }
   
   .glass-card {
-    @apply bg-white/60 backdrop-blur-lg border border-white/40 rounded-xl shadow-xl shadow-slate-200/50;
+    @apply bg-white/60 backdrop-blur-lg border border-white/40 rounded-2xl shadow-xl shadow-slate-200/50;
+    transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .glass-card:hover {
+    @apply bg-white/80 border-white/60 -translate-y-1;
+    shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.05);
   }
   
   .neon-glow {
     box-shadow: 0 0 20px rgba(14, 165, 233, 0.15);
   }
+
+  .mesh-gradient {
+    background-color: #f8fafc;
+    background-image: 
+      radial-gradient(at 0% 0%, hsla(199, 89%, 48%, 0.1) 0px, transparent 50%),
+      radial-gradient(at 50% 0%, hsla(187, 92%, 43%, 0.08) 0px, transparent 50%),
+      radial-gradient(at 100% 0%, hsla(199, 89%, 48%, 0.1) 0px, transparent 50%);
+  }
+
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-br from-slate-900 via-slate-800 to-marine-accent;
+  }
+
+}
+
+/* Redesigned Leaflet Popup */
+.marine-popup .leaflet-popup-content-wrapper {
+  @apply rounded-2xl shadow-2xl border-none p-0 overflow-hidden bg-white/95 backdrop-blur-md;
+}
+
+.marine-popup .leaflet-popup-content {
+  @apply m-0 !w-auto;
+}
+
+.marine-popup .leaflet-popup-tip {
+  @apply bg-white/95;
 }
 
 /* Custom scrollbar for light marine feel */

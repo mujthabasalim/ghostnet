@@ -3,6 +3,7 @@
 import React, { useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Circle } from 'react-leaflet';
 import L from 'leaflet';
+import { Compass } from 'lucide-react';
 import 'leaflet/dist/leaflet.css';
 import { cn } from "@/lib/utils";
 
@@ -106,25 +107,30 @@ export default function GhostMap({
               icon={NetIcon}
             >
             <Popup className="marine-popup">
-              <div className="p-1 min-w-[140px]">
-                <h4 className="font-bold text-slate-900 mb-0.5">{net.net_type || net.type}</h4>
-                <p className="text-[10px] text-slate-500 font-medium mb-2">Area: {net.area_name || 'N/A'}</p>
-                
-                <div className="flex flex-col gap-2">
-                  <div className={cn(
-                    "px-2 py-0.5 text-[9px] font-black rounded uppercase tracking-wider text-center",
-                    net.status === 'ACTIVE' ? "bg-rose-100 text-rose-700" : "bg-amber-100 text-amber-700"
+              <div className="p-4 min-w-[200px]">
+                <div className="flex items-center justify-between mb-3">
+                  <span className={cn(
+                    "px-2 py-0.5 text-[8px] font-black rounded uppercase tracking-widest shadow-sm",
+                    net.status === 'ACTIVE' ? "bg-rose-500 text-white" : "bg-amber-500 text-white"
                   )}>
                     {net.status}
-                  </div>
-                  
+                  </span>
+                  <span className="text-[10px] font-bold text-slate-400">#{net.id.substring(0, 4)}</span>
+                </div>
+                
+                <h4 className="text-lg font-black text-slate-900 leading-tight mb-1">{net.net_type || net.type}</h4>
+                <p className="text-xs text-slate-500 font-medium mb-4 flex items-center gap-1">
+                  <Compass size={12} className="text-marine-accent" />
+                  {net.area_name || 'Open Sea'}
+                </p>
+                
+                <div className="pt-3 border-t border-slate-100">
                   <a
                     href={`https://www.google.com/maps/dir/?api=1&destination=${net.lat},${net.lng}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-2 py-2 bg-marine-accent text-white rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-marine-700 transition-colors shadow-sm"
+                    className="w-full flex items-center justify-center gap-2 py-3 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-marine-accent transition-all duration-300 shadow-lg shadow-slate-200 active:scale-95"
                   >
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
                     Launch Navigation
                   </a>
                 </div>

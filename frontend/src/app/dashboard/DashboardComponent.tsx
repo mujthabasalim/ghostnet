@@ -12,6 +12,8 @@ const Map = dynamic(() => import("@/components/map"), {
 import { checkProximity } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from '@/context/LanguageContext';
+import { supabase } from "@/lib/supabase";
+import { toast } from "sonner";
 
 export default function DashboardComponent() {
   const { vessels, loading: aisLoading } = useAIS();
@@ -88,7 +90,24 @@ export default function DashboardComponent() {
 
     fetchNets();
     const interval = setInterval(fetchNets, 10000);
-    return () => clearInterval(interval);
+
+    // Real-time Broadcast Listener
+    const channel = supabase
+      .channel('maritime-alerts')
+      .on('broadcast', { event: 'new-hazard' }, (payload) => {
+        console.log('New hazard broadcast received:', payload);
+        toast.warning(payload.payload.message, {
+          description: payload.payload.title,
+          duration: 5000,
+        });
+        fetchNets(); // Refresh data immediately
+      })
+      .subscribe();
+
+    return () => {
+      clearInterval(interval);
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const stats = statsConfig.map((config) => {

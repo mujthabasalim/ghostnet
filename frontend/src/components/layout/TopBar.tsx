@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Search, User, Compass, LogOut, AlertTriangle, X } from "lucide-react";
+import Link from "next/link";
+import { Anchor, User, Compass, LogOut, AlertTriangle, X } from "lucide-react";
 import NotificationHub from "../notifications/NotificationHub";
 import LanguageSwitcher from "./LanguageSwitcher";
 import { motion, AnimatePresence } from "framer-motion";
@@ -23,9 +24,27 @@ export default function TopBar() {
   const { t } = useLanguage();
   const [user, setUser] = useState<any>(null);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
   const [currentLocation, setCurrentLocation] = useState<{lat: number, lng: number} | null>(null);
   const [areaName, setAreaName] = useState<string>(t('detecting_location'));
   const router = useRouter();
+  const menuRef = React.useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setShowUserMenu(false);
+      }
+    };
+
+    if (showUserMenu) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showUserMenu]);
 
   useEffect(() => {
     const getUser = async () => {
@@ -61,6 +80,7 @@ export default function TopBar() {
   const handleLogout = async () => {
     await supabase.auth.signOut();
     setShowLogoutConfirm(false);
+    setShowUserMenu(false);
     router.push("/");
   };
 
@@ -69,27 +89,21 @@ export default function TopBar() {
       <motion.header
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="h-16 bg-white/80 backdrop-blur-md border-b border-slate-200 flex items-center justify-between px-8 sticky top-0 z-30 shadow-sm"
+        className="h-16 bg-white/80 backdrop-blur-md border-b border-slate-200 flex items-center justify-between px-4 md:px-8 sticky top-0 z-30 shadow-sm"
       >
-        <div className="flex items-center gap-4 flex-1">
-          <div className="relative max-w-md w-full">
-            <Search
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-              size={18}
-            />
-            <input
-              type="text"
-              placeholder={t('search_placeholder')}
-              className="w-full bg-slate-50 border border-slate-200 rounded-full py-2 pl-10 pr-4 text-sm focus:outline-none focus:border-marine-accent focus:ring-4 focus:ring-marine-accent/10 focus:bg-white transition-all font-medium"
-            />
-          </div>
+        <div className="flex items-center gap-4">
+          <Link href="/" className="flex items-center gap-2 group">
+            <div className="p-2 bg-gradient-to-br from-marine-accent to-marine-cyan rounded-xl shadow-lg shadow-marine-accent/20 text-white group-hover:scale-110 transition-transform">
+              <Anchor size={20} />
+            </div>
+            <span className="text-lg font-black tracking-tighter text-slate-900">
+              GHOST<span className="text-marine-accent">NET</span>
+            </span>
+          </Link>
         </div>
 
-        <div className="flex items-center gap-4">
-          <LanguageSwitcher />
-          <NotificationHub />
-
-          <div className="hidden lg:flex items-center gap-3 px-4 py-1.5 bg-slate-100 rounded-full border border-slate-200 text-[10px] font-black tracking-wider text-slate-600 shadow-sm">
+        <div className="flex items-center gap-2 md:gap-4">
+          <div className="hidden md:flex items-center gap-3 px-4 py-1.5 bg-slate-100 rounded-full border border-slate-200 text-[10px] font-black tracking-wider text-slate-600 shadow-sm">
             <Compass
               size={14}
               className={cn("text-marine-accent", currentLocation ? "animate-pulse" : "animate-spin")}
@@ -104,49 +118,68 @@ export default function TopBar() {
             </div>
           </div>
 
-          <div className="flex items-center gap-4 pl-6 border-l border-slate-100">
+          <LanguageSwitcher />
+          <NotificationHub />
+
+          <div className="flex items-center gap-2 md:gap-4 pl-2 md:pl-6 border-l border-slate-100 relative" ref={menuRef}>
             {user ? (
-              <div className="text-right hidden sm:block">
-                <p className="text-sm font-black text-slate-900 leading-none">
-                  {user.user_metadata?.full_name || t('welcome_back')}
-                </p>
-                <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold mt-1">
-                  {user.user_metadata?.user_type?.replace("_", " ") ||
-                    t('registered_user')}{" "}
-                  • {user.user_metadata?.id_code || "N/A"}
-                </p>
+              <div className="flex items-center gap-3">
+                <div className="text-right hidden lg:block">
+                  <p className="text-sm font-black text-slate-900 leading-none">
+                    {user.user_metadata?.full_name || t('welcome_back')}
+                  </p>
+                  <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold mt-1">
+                    {user.user_metadata?.user_type?.replace("_", " ") ||
+                      t('registered_user')}
+                  </p>
+                </div>
+                
+                <button 
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                  className="w-10 h-10 rounded-2xl bg-gradient-to-br from-marine-accent to-marine-cyan flex items-center justify-center text-white shadow-lg shadow-marine-accent/20 hover:scale-105 active:scale-95 transition-all"
+                >
+                  <User size={20} />
+                </button>
+
+                <AnimatePresence>
+                  {showUserMenu && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                      className="absolute right-0 top-full mt-3 w-64 bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden z-50 p-4"
+                    >
+                      <div className="mb-4 pb-4 border-b border-slate-50">
+                        <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-2">User Account</p>
+                        <p className="text-base font-black text-slate-900 truncate">
+                          {user.user_metadata?.full_name || user.email}
+                        </p>
+                        <p className="text-[10px] text-marine-accent font-bold uppercase tracking-wider">
+                          {user.user_metadata?.user_type?.replace("_", " ") || "Member"} • {user.user_metadata?.id_code || "N/A"}
+                        </p>
+                      </div>
+
+                      <button
+                        onClick={() => {
+                          setShowUserMenu(false);
+                          setShowLogoutConfirm(true);
+                        }}
+                        className="w-full flex items-center justify-between px-4 py-3 bg-rose-50 text-rose-500 hover:bg-rose-100 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-colors group"
+                      >
+                        <span className="flex items-center gap-2">
+                          <LogOut size={16} /> Logout
+                        </span>
+                        <X size={14} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             ) : (
-              <div className="text-right hidden sm:block">
-                <p className="text-sm font-black text-slate-400 leading-none italic">
-                  {t('guest_guardian')}
-                </p>
-                <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold mt-1">
-                  {t('view_only_access')}
-                </p>
+              <div className="w-10 h-10 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400 border border-slate-200">
+                <User size={20} />
               </div>
             )}
-
-            <div className="group relative">
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="w-10 h-10 rounded-2xl bg-gradient-to-br from-marine-accent to-marine-cyan flex items-center justify-center text-white shadow-lg shadow-marine-accent/20 cursor-pointer"
-              >
-                <User size={20} />
-              </motion.div>
-
-              {user && (
-                <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-2xl border border-slate-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 p-2">
-                  <button
-                    onClick={() => setShowLogoutConfirm(true)}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-rose-500 hover:bg-rose-50 rounded-lg text-xs font-black uppercase tracking-widest transition-colors"
-                  >
-                    <LogOut size={16} /> {t('logout')}
-                  </button>
-                </div>
-              )}
-            </div>
           </div>
         </div>
       </motion.header>

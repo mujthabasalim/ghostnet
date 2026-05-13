@@ -79,15 +79,27 @@ export default function MissionMap({ missions, currentLocation, selectedMission,
                 click: () => onSelectMission(mission)
               }}
             >
-              <Popup>
-                <div className="p-2 min-w-[150px]">
-                  <p className="font-black text-xs uppercase tracking-tight text-slate-900">GN-{mission.id.substring(0, 5)}</p>
-                  <p className="text-[10px] font-bold text-slate-400 mb-2">{mission.net_type}</p>
-                  <div className={cn(
-                    "px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest inline-block",
-                    mission.status === 'ACTIVE' ? "bg-rose-500 text-white" : "bg-amber-500 text-white"
-                  )}>
-                    {mission.status}
+              <Popup className="marine-popup">
+                <div className="p-4 min-w-[180px]">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className={cn(
+                      "px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest shadow-sm",
+                      mission.status === 'ACTIVE' ? "bg-rose-500 text-white" : "bg-amber-500 text-white"
+                    )}>
+                      {mission.status}
+                    </span>
+                    <span className="text-[10px] font-bold text-slate-400 italic">GN-{mission.id.substring(0, 5)}</span>
+                  </div>
+                  <h4 className="text-base font-black text-slate-900 leading-tight mb-1">{mission.net_type}</h4>
+                  <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-3">Priority: High</p>
+                  
+                  <div className="pt-3 border-t border-slate-100">
+                    <button 
+                      onClick={() => onSelectMission(mission)}
+                      className="w-full py-2.5 bg-slate-100 hover:bg-marine-accent hover:text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all"
+                    >
+                      View Details
+                    </button>
                   </div>
                 </div>
               </Popup>

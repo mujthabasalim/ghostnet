@@ -21,8 +21,11 @@ export function getDistance(lat1: number, lon1: number, lat2: number, lon2: numb
 }
 
 export function checkProximity(vessel: any, nets: any[]) {
+  const SAFETY_RADIUS = 1000; // 1km default
   return nets.filter(net => {
+    if (!net.lat || !net.lng) return false;
     const distance = getDistance(vessel.lat, vessel.lng, net.lat, net.lng);
-    return distance <= net.radius;
+    const radius = net.radius || SAFETY_RADIUS;
+    return distance <= radius;
   });
 }
