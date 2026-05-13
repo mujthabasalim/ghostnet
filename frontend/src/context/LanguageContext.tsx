@@ -62,6 +62,7 @@ export const dictionary: Translations = {
   net_length: { en: 'NET LENGTH (METERS)', ml: 'വലയുടെ നീളം (മീറ്റർ)', ta: 'வலையின் நீளம் (மீட்டர்)', hi: 'जाल की लंबाई (मीटर)' },
   float_color: { en: 'FLOAT COLOR', ml: 'ഫ്ലോട്ട് നിറം', ta: 'மிதவை நிறம்', hi: 'फ्लोट रंग' },
   float_description: { en: 'FLOAT DESCRIPTION', ml: 'ഫ്ലോട്ട് വിവരണം', ta: 'மிதவை விளக்கம்', hi: 'फ्लोट विवरण' },
+  net_color: { en: 'NET COLOR', ml: 'വലയുടെ നിറം', ta: 'வலையின் நிறம்', hi: 'जाल का रंग' },
   next_step: { en: 'Next Step', ml: 'അടുത്ത ഘട്ടം', ta: 'அடுத்த படி', hi: 'अगला चरण' },
   back: { en: 'Back', ml: 'പുറകോട്ട്', ta: 'பின்னால்', hi: 'पीछे' },
   location_details: { en: 'Location Details', ml: 'ലൊക്കേഷൻ വിവരങ്ങൾ', ta: 'இருப்பிட விவரங்கள்', hi: 'स्थान विवरण' },
@@ -103,9 +104,9 @@ export const dictionary: Translations = {
   radius: { en: 'Radius', ml: 'ആരം', ta: 'ஆரம்', hi: 'त्रिज्या' },
   reporter_information: { en: 'Reporter Information', ml: 'റിപ്പോർട്ടറുടെ വിവരങ്ങൾ', ta: 'புகாரளிப்பவர் தகவல்', hi: 'रिपोर्टर की जानकारी' },
   verified_guardian: { en: 'Verified Guardian', ml: 'പരിശോധിച്ചുറപ്പിച്ച ഗാർഡിയൻ', ta: 'சரிபார்க்கப்பட்ட பாதுகாவலர்', hi: 'सत्यापित अभिभावक' },
-  mobile: { en: 'Mobile', ml: 'മൊബൈൽ', ta: 'கைபேசி', hi: 'मोबाइल' },
+  mobile: { en: 'Mobile', ml: 'മൊബൈൽ', ta: 'கைபேസി', hi: 'मोबाइल' },
   govt_id: { en: 'Govt ID', ml: 'ഗവൺമെന്റ് ഐഡി', ta: 'அரசு ஐடி', hi: 'सरकारी आईडी' },
-  reporter_data_unavailable: { en: 'Reporter data unavailable for this hazard.', ml: 'ഈ അപകടത്തിനായുള്ള റിപ്പോർട്ടറുടെ വിവരങ്ങൾ ലഭ്യമല്ല.', ta: 'இந்த அபாயத்திற்கான புகாரளிப்பவர் தரவு இல்லை.', hi: 'इस खतरे के लिए रिपोर्टर डेटा अनुपलब्ध है।' },
+  reporter_data_unavailable: { en: 'Reporter data unavailable for this hazard.', ml: 'ഈ അപകടത്തിനായുള്ള റിപ്പോർട്ടറുടെ വിവരങ്ങൾ ലഭ്യമല്ല.', ta: 'இந்த அபாயத்திற்கான புகாரளிப்பவர் தரவு இல்லை.', hi: 'इस खतरे के लिए रिपोर्टर डेटा अनुपलब्ध is.' },
   navigation_brief: { en: 'Navigation Brief', ml: 'നാവിഗേഷൻ വിവരം', ta: 'வழிசெலுத்தல் சுருக்கம்', hi: 'नेविगेशन ब्रीफ' },
   distance_to_target: { en: 'Distance to Target', ml: 'ലക്ഷ്യസ്ഥാനത്തേക്കുള്ള ദൂരം', ta: 'இலக்கிற்கான தூரம்', hi: 'लक्ष्य की दूरी' },
   bearing: { en: 'Bearing', ml: 'ബിയറിംഗ്', ta: 'தாங்கி', hi: 'बेयरिंग' },
@@ -130,6 +131,7 @@ export const dictionary: Translations = {
   rough: { en: 'Rough', ml: 'പ്രക്ഷുബ്ധം', ta: 'கடுமையான', hi: 'ऊबड़-खाबड़' },
   stormy: { en: 'Stormy', ml: 'കൊടുങ്കാറ്റുള്ള', ta: 'புயல்', hi: 'तूफानी' },
   clear: { en: 'Clear', ml: 'തെളിഞ്ഞ', ta: 'தெளிவான', hi: 'साफ़' },
+  select_weather: { en: 'Select Weather', ml: 'കാലാവസ്ഥ തിരഞ്ഞെടുക്കുക', ta: 'வானிலையைத் தேர்ந்தெடுக்கவும்', hi: 'मौसम चुनें' },
   image_verified: { en: 'Image Verified', ml: 'ചിത്രം പരിശോധിച്ചു', ta: 'படம் சரிபார்க்கப்பட்டது', hi: 'छवि सत्यापित' },
   metadata_attached: { en: 'Metadata attached for validation', ml: 'പരിശോധനയ്ക്കായി മെറ്റാഡാറ്റ ചേർത്തിട്ടുണ്ട്', ta: 'சரிபார்ப்பிற்காக மெட்டாடேட்டா இணைக்கப்பட்டுள்ளது', hi: 'सत्यापन के लिए मेटाडेटा संलग्न' },
   
@@ -167,6 +169,8 @@ export const dictionary: Translations = {
   resend_otp: { en: 'Resend OTP', ml: 'വീണ്ടും അയക്കുക', ta: 'OTP ஐ மீண்டும் அனுப்பவும்', hi: 'ओटीपी पुनः भेजें' },
   invalid_otp: { en: 'Invalid verification code', ml: 'അസാധുവായ കോഡ്', ta: 'தவறான சரிபார்ப்புக் குறியீடு', hi: 'अमान्य सत्यापन कोड' },
   email_verification_sent: { en: 'Verification email sent to your new address.', ml: 'പുതിയ വിലാസത്തിലേക്ക് ഇമെയിൽ അയച്ചു.', ta: 'உங்கள் புதிய முகவரிக்கு சரிபார்ப்பு மின்னஞ்சல் அனுப்பப்பட்டது.', hi: 'आपके नए पते पर सत्यापन ईमेल भेजा गया।' },
+  field_required: { en: 'This field is required', ml: 'ഈ ഫീൽഡ് നിർബന്ധമാണ്', ta: 'இந்த புலம் தேவை', hi: 'यह फ़ील्ड आवश्यक है' },
+  land_restriction_msg: { en: 'Reporting restricted to maritime areas. Enable Simulation Mode for testing.', ml: 'റിപ്പോർട്ടിംഗ് സമുദ്ര പ്രദേശങ്ങളിൽ മാത്രമായി പരിമിതപ്പെടുത്തിയിരിക്കുന്നു. പരീക്ഷണത്തിനായി സിമുലേഷൻ മോഡ് പ്രവർത്തനക്ഷമമാക്കുക.', ta: 'அறிக்கை கடல் பகுதிகளுக்கு மட்டுமே வரையறுக்கப்பட்டுள்ளது. சோதனைக்கு உருவகப்படுத்துதல் பயன்முறையை இயக்கவும்.', hi: 'रिपोर्टिंग समुद्री क्षेत्रों तक ही सीमित है। परीक्षण के लिए सिमुलेशन मोड सक्षम करें।' },
   welcome_back: { en: 'Welcome back', ml: 'വീണ്ടും സ്വാഗതം', ta: 'மீண்டும் வருக', hi: 'वापसी पर स्वागत है' }
 };
 

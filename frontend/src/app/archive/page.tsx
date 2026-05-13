@@ -254,21 +254,120 @@ export default function ArchivePage() {
               </div>
 
               {/* Certificate content for capture */}
-              <div ref={certificateRef} className="flex flex-col md:flex-row w-full bg-white overflow-y-auto md:overflow-hidden">
-                {/* Image Section - Now Hero Focus on Retrieval */}
-                <div className="w-full md:w-1/2 bg-slate-950 p-1 flex flex-col items-stretch overflow-hidden shrink-0 order-last md:order-first">
-                  <div className="flex-1 relative group overflow-hidden bg-slate-900 flex items-center justify-center min-h-[220px] sm:min-h-[300px] md:min-h-full">
+              <div className="flex-1 overflow-auto bg-slate-100 p-4 sm:p-8 flex items-center justify-center">
+                <div 
+                  ref={certificateRef} 
+                  className="w-[800px] h-[560px] flex bg-white shadow-2xl relative shrink-0 overflow-hidden rounded-sm"
+                  style={{ transformOrigin: 'center center' }}
+                >
+                  {/* Left Section: Details */}
+                  <div className="w-1/2 p-10 flex flex-col justify-between bg-white relative border-r border-slate-50">
+                    {/* Watermark */}
+                    <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none rotate-12">
+                      <Anchor size={300} />
+                    </div>
+
+                    <div className="relative z-10">
+                      <div className="flex justify-between items-start mb-8">
+                        <div>
+                          <div className="flex items-center gap-2 mb-2">
+                            <div className="w-8 h-1 bg-marine-accent rounded-full" />
+                            <span className="text-[9px] font-black text-marine-accent uppercase tracking-widest">
+                              Official Record
+                            </span>
+                          </div>
+                          <h2 className="text-3xl font-black text-slate-900 tracking-tight leading-none uppercase">
+                            {t('retrieval')}
+                            <br />
+                            {t('certificate')}
+                          </h2>
+                          <p className="text-slate-400 font-bold uppercase text-[9px] tracking-widest mt-4">
+                            Serial: GN-SYS-{selectedCertificate.id.substring(0, 12).toUpperCase()}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-6">
+                        <div className="grid grid-cols-2 gap-8">
+                          <div className="space-y-1">
+                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">
+                              {t('hazard_id')}
+                            </p>
+                            <p className="text-sm font-black text-slate-900">
+                              {selectedCertificate.net_type}
+                            </p>
+                          </div>
+                          <div className="space-y-1">
+                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">
+                              Retrieval Date
+                            </p>
+                            <p className="text-sm font-black text-slate-900">
+                              {selectedCertificate.retrieved_at
+                                ? new Date(selectedCertificate.retrieved_at).toLocaleDateString("en-US", {
+                                    month: "short",
+                                    day: "numeric",
+                                    year: "numeric",
+                                  })
+                                : "---"}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="space-y-4 pt-6 border-t border-slate-100">
+                          <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-900 border border-slate-100 shadow-sm shrink-0">
+                              <Users className="w-6 h-6" />
+                            </div>
+                            <div>
+                              <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">
+                                {t('retrieved_by')}
+                              </p>
+                              <p className="text-sm font-black text-slate-900">
+                                {selectedCertificate.retriever?.full_name || t('verified_specialist')}
+                              </p>
+                              <p className="text-[9px] text-marine-accent font-bold uppercase tracking-wider">
+                                {t('credential_id')}: {selectedCertificate.retriever?.id_code || "NON-SPEC"}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="pt-6 border-t border-slate-100">
+                          <div className="flex items-center gap-2 text-emerald-600 mb-2">
+                            <CheckCircle2 size={16} />
+                            <span className="text-[9px] font-black uppercase tracking-widest">
+                              Identity & Proximity Verified
+                            </span>
+                          </div>
+                          <p className="text-[9px] text-slate-500 leading-relaxed font-medium uppercase">
+                            The GhostNet Protocol confirms this mission was completed with mandatory image evidence and verified GPS proximity. This record is digitally signed.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mt-6 flex items-end justify-between relative z-10">
+                      <div className="space-y-2">
+                        <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest italic">
+                          Digital Signature
+                        </p>
+                        <p className="font-mono text-[8px] text-slate-300 select-none">
+                          AUTH-{selectedCertificate.retriever?.id_code || "GHOST"}-HASH-{selectedCertificate.id.substring(0, 8)}
+                        </p>
+                      </div>
+                      <div className="w-16 h-16 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-center text-slate-200">
+                        <Anchor className="w-8 h-8" />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Right Section: Image */}
+                  <div className="w-1/2 bg-slate-950 relative overflow-hidden flex items-center justify-center">
                     {selectedCertificate.retrieval_image_url ? (
                       <img
                         src={selectedCertificate.retrieval_image_url}
-                        className="w-full h-full object-cover opacity-90 transition-opacity"
+                        className="w-full h-full object-cover opacity-90"
                         alt="Retrieval Evidence"
-                      />
-                    ) : selectedCertificate.image_url ? (
-                      <img
-                        src={selectedCertificate.image_url}
-                        className="w-full h-full object-cover opacity-60 transition-opacity"
-                        alt="Original Report"
                       />
                     ) : (
                       <div className="flex flex-col items-center gap-4 text-slate-700">
@@ -279,143 +378,21 @@ export default function ArchivePage() {
                       </div>
                     )}
 
-                    {/* Official Overlays */}
-                    <div className="absolute top-8 left-8 flex flex-col gap-2">
+                    <div className="absolute inset-0 bg-gradient-to-l from-slate-950/40 to-transparent" />
+                    
+                    <div className="absolute top-8 right-8">
                       <div className="bg-emerald-500 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] shadow-2xl flex items-center gap-2">
                         <ShieldCheck size={14} /> {t('certified_retrievals')}
                       </div>
                     </div>
 
-                    <div className="absolute bottom-0 left-0 w-full p-8 bg-gradient-to-t from-slate-950 to-transparent">
+                    <div className="absolute bottom-10 left-10 text-white">
                       <p className="text-[10px] font-black text-emerald-400 uppercase tracking-widest mb-1">
-                        {t('location')}
+                        GPS VERIFIED LOCATION
                       </p>
-                      <p className="text-sm font-mono text-white opacity-80">
-                        {(
-                          selectedCertificate.retrieval_lat ||
-                          selectedCertificate.lat
-                        )?.toFixed(6)}
-                        ° N,{" "}
-                        {(
-                          selectedCertificate.retrieval_lng ||
-                          selectedCertificate.lng
-                        )?.toFixed(6)}
-                        ° E
+                      <p className="text-sm font-mono opacity-80">
+                        {selectedCertificate.lat?.toFixed(6)}° N, {selectedCertificate.lng?.toFixed(6)}° E
                       </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Details Section */}
-                <div className="w-full md:w-1/2 p-5 sm:p-10 flex flex-col justify-between bg-white relative min-w-0 order-first md:order-last">
-                  {/* Watermark */}
-                  <div className="absolute inset-0 flex items-center justify-center opacity-[0.02] pointer-events-none rotate-12">
-                    <Anchor size={400} />
-                  </div>
-
-                  <div className="relative z-10">
-                    <div className="flex justify-between items-start mb-6 sm:mb-10">
-                      <div>
-                        <div className="flex items-center gap-2 mb-2">
-                          <div className="w-8 h-1 bg-marine-accent rounded-full" />
-                          <span className="text-[9px] sm:text-[10px] font-black text-marine-accent uppercase tracking-widest">
-                            Official Record
-                          </span>
-                        </div>
-                        <h2 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight leading-none">
-                          {t('retrieval')}
-                          <br />
-                          {t('certificate')}
-                        </h2>
-                        <p className="text-slate-400 font-bold uppercase text-[9px] sm:text-[10px] tracking-widest mt-2 sm:mt-4">
-                          Serial: GN-SYS-
-                          {selectedCertificate.id
-                            .substring(0, 12)
-                            .toUpperCase()}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="space-y-6">
-                      <div className="grid grid-cols-2 gap-4 sm:gap-8">
-                        <div className="space-y-1 min-w-0">
-                          <p className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest truncate">
-                            {t('hazard_id')}
-                          </p>
-                          <p className="text-sm sm:text-base font-black text-slate-900 truncate">
-                            {selectedCertificate.net_type}
-                          </p>
-                        </div>
-                        <div className="space-y-1 min-w-0">
-                          <p className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest truncate">
-                            Retrieval Date
-                          </p>
-                          <p className="text-sm sm:text-base font-black text-slate-900 truncate">
-                            {selectedCertificate.retrieved_at
-                              ? new Date(
-                                  selectedCertificate.retrieved_at,
-                                ).toLocaleDateString("en-US", {
-                                  month: "short",
-                                  day: "numeric",
-                                  year: "numeric",
-                                })
-                              : "---"}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="space-y-4 pt-4 sm:pt-6 border-t border-slate-100">
-                        <div className="flex items-center gap-3 sm:gap-4 min-w-0">
-                          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-900 border border-slate-100 shadow-sm shrink-0">
-                            <Users className="w-5 h-5 sm:w-6 sm:h-6" />
-                          </div>
-                          <div className="min-w-0">
-                            <p className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest truncate">
-                                {t('retrieved_by')}
-                              </p>
-                            <p className="text-xs sm:text-sm font-black text-slate-900 truncate">
-                              {selectedCertificate.retriever?.full_name ||
-                                t('verified_specialist')}
-                            </p>
-                            <p className="text-[9px] sm:text-[10px] text-marine-accent font-bold uppercase tracking-wider truncate">
-                              {t('credential_id')}:{" "}
-                              {selectedCertificate.retriever?.id_code ||
-                                "NON-SPEC"}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="pt-4 sm:pt-6 border-t border-slate-100">
-                        <div className="flex items-center gap-2 sm:gap-3 text-emerald-600 mb-2">
-                          <CheckCircle2 size={18} className="shrink-0" />
-                          <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest line-clamp-1">
-                            Identity & Proximity Verified
-                          </span>
-                        </div>
-                        <p className="text-[9px] sm:text-[10px] text-slate-500 leading-relaxed font-medium uppercase line-clamp-4 sm:line-clamp-none">
-                          The GhostNet Protocol confirms this mission was
-                          completed with mandatory image evidence and verified
-                          GPS proximity. This record is digitally signed and
-                          cryptographically linked to the specialist's biometric
-                          credential.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="mt-4 sm:mt-6 flex items-end justify-between relative z-10 gap-2">
-                    <div className="space-y-1 sm:space-y-2 min-w-0">
-                      <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest italic">
-                        Digital Signature
-                      </p>
-                      <p className="font-mono text-[8px] sm:text-[9px] text-slate-300 select-none truncate">
-                        AUTH-{selectedCertificate.retriever?.id_code || "GHOST"}
-                        -HASH-{Date.now().toString(36)}
-                      </p>
-                    </div>
-                    <div className="w-12 h-12 sm:w-16 sm:h-16 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-center text-slate-200 shrink-0">
-                      <Anchor className="w-6 h-6 sm:w-8 sm:h-8" />
                     </div>
                   </div>
                 </div>

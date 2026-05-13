@@ -37,7 +37,6 @@ export default function RetrievalsPage() {
   const [retrievalImage, setRetrievalImage] = useState<string | null>(null);
   const router = useRouter();
 
-  const PROXIMITY_THRESHOLD = 0.54; // ~1000 meters in Nautical Miles
 
   useEffect(() => {
     setMounted(true);
@@ -258,15 +257,15 @@ export default function RetrievalsPage() {
                     <div className="flex flex-col items-end gap-2 shrink-0">
                       <div className="flex items-center gap-2 sm:gap-4">
                         {/* Dev Simulation Toggle */}
-                        <label className="flex items-center gap-1.5 sm:gap-2 cursor-pointer bg-white px-2 py-1 rounded-lg border border-slate-200 shadow-sm">
+                        <label className="flex items-center gap-2 cursor-pointer bg-white px-2 py-1 rounded-xl border border-slate-200 shadow-sm transition-all hover:bg-slate-50">
                           <input 
                             type="checkbox" 
                             className="sr-only peer" 
                             checked={isDevMode}
                             onChange={(e) => setIsDevMode(e.target.checked)}
                           />
-                          <div className="w-6 sm:w-7 h-3.5 sm:h-4 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-2.5 sm:after:h-3 after:w-2.5 sm:after:w-3 after:transition-all peer-checked:bg-amber-500"></div>
-                          <span className="text-[7px] sm:text-[8px] font-black text-slate-500 uppercase tracking-tighter">SIM</span>
+                          <div className="relative w-8 h-4 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-amber-500"></div>
+                          <span className="text-[8px] font-black text-slate-500 uppercase tracking-tighter">SIM</span>
                         </label>
                         <button
                           onClick={() => {
@@ -301,7 +300,7 @@ export default function RetrievalsPage() {
                       <div className="min-w-0">
                         <span className="block text-[10px] text-slate-400 uppercase font-bold">{t('radius')}</span>
                         <span className="text-xs sm:text-sm text-black font-medium block">
-                          {selectedMission.radius}m
+                          {selectedMission.radius || (selectedMission.length ? Math.round(selectedMission.length * 1.5) : 1000)}m
                         </span>
                       </div>
                       <div className="min-w-0">
@@ -492,7 +491,9 @@ export default function RetrievalsPage() {
                               currentLocation.lat, currentLocation.lng, 
                               selectedMission.lat, selectedMission.lng
                             ) : 999;
-                            const isOnSite = dist <= PROXIMITY_THRESHOLD;
+                            const missionRadius = selectedMission.radius || (selectedMission.length ? Math.round(selectedMission.length * 1.5) : 1000);
+                            const dynamicThreshold = Math.max(missionRadius * 0.00054, 0.05); // NM conversion + 90m safety buffer
+                            const isOnSite = dist <= dynamicThreshold;
 
                             return (
                               <button 

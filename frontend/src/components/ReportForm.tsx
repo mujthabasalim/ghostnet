@@ -66,6 +66,8 @@ export default function ReportForm() {
   const [isLocating, setIsLocating] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState("");
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isOnLand, setIsOnLand] = useState<boolean | null>(null);
   const [session, setSession] = useState<any>(null);
   const router = useRouter();
 
@@ -81,13 +83,46 @@ export default function ReportForm() {
     return () => subscription.unsubscribe();
   }, []);
 
-  const nextStep = () => {
+  const validateStep = () => {
+    const newErrors: Record<string, string> = {};
+    
     if (step === 1) {
-      getLocation();
+      if (!formData.length) newErrors.length = t('field_required');
+      if (!formData.color) newErrors.color = t('field_required');
+      if (!formData.floatColor) newErrors.floatColor = t('field_required');
+      if (!formData.floatDesc) newErrors.floatDesc = t('field_required');
+    } else if (step === 2) {
+      if (!formData.lat || !formData.lng) newErrors.gps = t('gps_initialize');
+      if (!formData.areaName) newErrors.areaName = t('field_required');
+      
+      // Land Restriction
+      if (!formData.isDevReport && isOnLand) {
+        newErrors.gps = t('land_restriction_msg');
+      }
+    } else if (step === 3) {
+      if (!formData.depth) newErrors.depth = t('field_required');
+      if (!formData.weather) newErrors.weather = t('field_required');
+      if (!formData.imageUrl) newErrors.image = t('evidence_required');
     }
-    setStep((s) => s + 1);
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
-  const prevStep = () => setStep((s) => s - 1);
+
+  const nextStep = () => {
+    if (isLocating) return;
+    if (validateStep()) {
+      if (step === 1) {
+        getLocation();
+      }
+      setStep((s) => s + 1);
+    }
+  };
+
+  const prevStep = () => {
+    setErrors({});
+    setStep((s) => s - 1);
+  };
 
   const getLocation = () => {
     setIsLocating(true);
@@ -98,9 +133,25 @@ export default function ReportForm() {
     }
 
     navigator.geolocation.getCurrentPosition(
-      (position) => {
+      async (position) => {
         const lat = position.coords.latitude;
         const lng = position.coords.longitude;
+        
+        // Simulating Land Check (usually would use an API or local GeoJSON)
+        // For now, let's check via a public API heuristic if needed, 
+        // but let's use a simpler "simulation" of land check here.
+        try {
+          const response = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`);
+          const data = await response.json();
+          // If nominatim returns an address with a country/city but no 'ocean' or 'sea', 
+          // it might be land. This is a heuristic.
+          const landIndicators = ['house_number', 'road', 'suburb', 'city', 'postcode', 'country', 'state', 'village', 'town', 'neighbourhood'];
+          const isLand = data.address && landIndicators.some(key => key in data.address);
+          setIsOnLand(!!isLand);
+        } catch (e) {
+          setIsOnLand(false); // Fallback to allowed if API fails
+        }
+
         setFormData((prev) => ({
           ...prev,
           lat: lat.toFixed(6),
@@ -146,6 +197,7 @@ export default function ReportForm() {
   };
 
   const handleSubmit = async () => {
+    if (!validateStep()) return;
     setLoading(true);
     setSubmitError("");
     try {
@@ -289,17 +341,41 @@ export default function ReportForm() {
 
                 <div className="space-y-3">
                   <label className="text-xs font-black text-slate-500 uppercase tracking-[0.2em]">
+                    {t('net_color')}
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.color}
+                    onChange={(e) => {
+                      setFormData({ ...formData, color: e.target.value });
+                      if (errors.color) setErrors({ ...errors, color: "" });
+                    }}
+                    placeholder="e.g. Dark Green"
+                    className={cn(
+                      "w-full bg-slate-50 border rounded-2xl py-3 sm:py-4 px-4 sm:px-6 text-slate-900 focus:outline-none focus:bg-white focus:ring-4 transition-all font-bold text-sm sm:text-base",
+                      errors.color ? "border-rose-500 focus:ring-rose-500/10" : "border-slate-200 focus:border-marine-accent focus:ring-marine-accent/10"
+                    )}
+                  />
+                  {errors.color && <p className="text-[10px] text-rose-500 font-bold uppercase tracking-widest ml-1">{errors.color}</p>}
+                </div>
+                <div className="space-y-3">
+                  <label className="text-xs font-black text-slate-500 uppercase tracking-[0.2em]">
                     {t('net_length')}
                   </label>
                   <input
                     type="number"
                     value={formData.length}
-                    onChange={(e) =>
-                      setFormData({ ...formData, length: e.target.value })
-                    }
+                    onChange={(e) => {
+                      setFormData({ ...formData, length: e.target.value });
+                      if (errors.length) setErrors({ ...errors, length: "" });
+                    }}
                     placeholder="e.g. 500"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3 sm:py-4 px-4 sm:px-6 text-slate-900 focus:outline-none focus:border-marine-accent focus:bg-white focus:ring-4 focus:ring-marine-accent/10 transition-all font-bold text-sm sm:text-base"
+                    className={cn(
+                      "w-full bg-slate-50 border rounded-2xl py-3 sm:py-4 px-4 sm:px-6 text-slate-900 focus:outline-none focus:bg-white focus:ring-4 transition-all font-bold text-sm sm:text-base",
+                      errors.length ? "border-rose-500 focus:ring-rose-500/10" : "border-slate-200 focus:border-marine-accent focus:ring-marine-accent/10"
+                    )}
                   />
+                  {errors.length && <p className="text-[10px] text-rose-500 font-bold uppercase tracking-widest ml-1">{errors.length}</p>}
                   {formData.length && (
                     <motion.p
                       initial={{ opacity: 0, x: -10 }}
@@ -321,12 +397,17 @@ export default function ReportForm() {
                   <input
                     type="text"
                     value={formData.floatColor}
-                    onChange={(e) =>
-                      setFormData({ ...formData, floatColor: e.target.value })
-                    }
+                    onChange={(e) => {
+                      setFormData({ ...formData, floatColor: e.target.value });
+                      if (errors.floatColor) setErrors({ ...errors, floatColor: "" });
+                    }}
                     placeholder="e.g. Neon Orange"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3 sm:py-4 px-4 sm:px-6 text-slate-900 focus:outline-none focus:border-marine-accent focus:bg-white focus:ring-4 focus:ring-marine-accent/10 transition-all font-bold text-sm sm:text-base"
+                    className={cn(
+                      "w-full bg-slate-50 border rounded-2xl py-3 sm:py-4 px-4 sm:px-6 text-slate-900 focus:outline-none focus:bg-white focus:ring-4 transition-all font-bold text-sm sm:text-base",
+                      errors.floatColor ? "border-rose-500 focus:ring-rose-500/10" : "border-slate-200 focus:border-marine-accent focus:ring-marine-accent/10"
+                    )}
                   />
+                  {errors.floatColor && <p className="text-[10px] text-rose-500 font-bold uppercase tracking-widest ml-1">{errors.floatColor}</p>}
                 </div>
                 <div className="space-y-3">
                   <label className="text-xs font-black text-slate-500 uppercase tracking-[0.2em]">
@@ -335,12 +416,17 @@ export default function ReportForm() {
                   <input
                     type="text"
                     value={formData.floatDesc}
-                    onChange={(e) =>
-                      setFormData({ ...formData, floatDesc: e.target.value })
-                    }
+                    onChange={(e) => {
+                      setFormData({ ...formData, floatDesc: e.target.value });
+                      if (errors.floatDesc) setErrors({ ...errors, floatDesc: "" });
+                    }}
                     placeholder="e.g. Large blue buoy with white stripe"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3 sm:py-4 px-4 sm:px-6 text-slate-900 focus:outline-none focus:border-marine-accent focus:bg-white focus:ring-4 focus:ring-marine-accent/10 transition-all font-bold text-sm sm:text-base"
+                    className={cn(
+                      "w-full bg-slate-50 border rounded-2xl py-3 sm:py-4 px-4 sm:px-6 text-slate-900 focus:outline-none focus:bg-white focus:ring-4 transition-all font-bold text-sm sm:text-base",
+                      errors.floatDesc ? "border-rose-500 focus:ring-rose-500/10" : "border-slate-200 focus:border-marine-accent focus:ring-marine-accent/10"
+                    )}
                   />
+                  {errors.floatDesc && <p className="text-[10px] text-rose-500 font-bold uppercase tracking-widest ml-1">{errors.floatDesc}</p>}
                 </div>
               </div>
 
@@ -392,16 +478,31 @@ export default function ReportForm() {
                   </div>
                 ) : (
                   <div className="h-full flex flex-col items-center justify-center gap-4 bg-slate-50">
-                    <MapPin size={40} className="text-slate-300" />
+                    <MapPin size={40} className={cn("text-slate-300", errors.gps && "text-rose-400")} />
                     <button 
                       onClick={getLocation}
-                      className="bg-marine-accent text-white px-6 py-3 rounded-xl font-bold hover:shadow-lg transition-all"
+                      className={cn(
+                        "px-6 py-3 rounded-xl font-bold hover:shadow-lg transition-all",
+                        errors.gps ? "bg-rose-500 text-white" : "bg-marine-accent text-white"
+                      )}
                     >
                       {t('gps_initialize')}
                     </button>
+                    {errors.gps && <p className="text-[10px] text-rose-500 font-bold uppercase tracking-widest">{errors.gps}</p>}
                   </div>
                 )}
               </div>
+
+              {errors.gps && (
+                <motion.div 
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="p-4 bg-rose-50 border border-rose-100 rounded-2xl flex items-center gap-3"
+                >
+                  <AlertCircle size={20} className="text-rose-500 shrink-0" />
+                  <p className="text-xs font-bold text-rose-600 uppercase tracking-tight">{errors.gps}</p>
+                </motion.div>
+              )}
 
               <div className="flex items-center justify-center gap-8 py-2">
                 <div className="text-center">
@@ -431,7 +532,13 @@ export default function ReportForm() {
                       type="checkbox" 
                       className="sr-only peer" 
                       checked={formData.isDevReport}
-                      onChange={(e) => setFormData({...formData, isDevReport: e.target.checked})}
+                      onChange={(e) => {
+                        setFormData({...formData, isDevReport: e.target.checked});
+                        if (errors.gps) setErrors(prev => {
+                          const { gps, ...rest } = prev;
+                          return rest;
+                        });
+                      }}
                     />
                     <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
                     <span className="ml-3 text-xs font-black text-amber-900 uppercase tracking-widest">{t('simulation_mode')}</span>
@@ -448,10 +555,17 @@ export default function ReportForm() {
                 <input
                   type="text"
                   value={formData.areaName}
-                  onChange={(e) => setFormData({ ...formData, areaName: e.target.value })}
+                  onChange={(e) => {
+                    setFormData({ ...formData, areaName: e.target.value });
+                    if (errors.areaName) setErrors({ ...errors, areaName: "" });
+                  }}
                   placeholder={t('eg_bay_of_bengal')}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3 sm:py-4 px-4 sm:px-6 text-slate-900 focus:outline-none focus:border-marine-accent focus:bg-white transition-all font-bold text-sm sm:text-base"
+                  className={cn(
+                    "w-full bg-slate-50 border rounded-2xl py-3 sm:py-4 px-4 sm:px-6 text-slate-900 focus:outline-none focus:bg-white transition-all font-bold text-sm sm:text-base",
+                    errors.areaName ? "border-rose-500" : "border-slate-200 focus:border-marine-accent"
+                  )}
                 />
+                {errors.areaName && <p className="text-[10px] text-rose-500 font-bold uppercase tracking-widest ml-1">{errors.areaName}</p>}
               </div>
 
               <div className="flex flex-col-reverse sm:flex-row justify-between gap-4 pt-6 sm:pt-10">
@@ -490,11 +604,16 @@ export default function ReportForm() {
                   <input
                     type="number"
                     value={formData.depth}
-                    onChange={(e) =>
-                      setFormData({ ...formData, depth: e.target.value })
-                    }
-                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3 sm:py-4 px-4 sm:px-6 text-slate-900 focus:outline-none focus:border-marine-accent font-bold text-sm sm:text-base"
+                    onChange={(e) => {
+                      setFormData({ ...formData, depth: e.target.value });
+                      if (errors.depth) setErrors({ ...errors, depth: "" });
+                    }}
+                    className={cn(
+                      "w-full bg-slate-50 border rounded-2xl py-3 sm:py-4 px-4 sm:px-6 text-slate-900 focus:outline-none focus:bg-white transition-all font-bold text-sm sm:text-base",
+                      errors.depth ? "border-rose-500" : "border-slate-200 focus:border-marine-accent"
+                    )}
                   />
+                  {errors.depth && <p className="text-[10px] text-rose-500 font-bold uppercase tracking-widest ml-1">{errors.depth}</p>}
                 </div>
                 <div className="space-y-3">
                   <label className="text-xs font-black text-slate-500 uppercase tracking-[0.2em]">
@@ -502,16 +621,22 @@ export default function ReportForm() {
                   </label>
                   <select
                     value={formData.weather}
-                    onChange={(e) =>
-                      setFormData({ ...formData, weather: e.target.value })
-                    }
-                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3 sm:py-4 px-4 sm:px-6 text-slate-900 focus:outline-none focus:border-marine-accent font-bold cursor-pointer text-sm sm:text-base"
+                    onChange={(e) => {
+                      setFormData({ ...formData, weather: e.target.value });
+                      if (errors.weather) setErrors({ ...errors, weather: "" });
+                    }}
+                    className={cn(
+                      "w-full bg-slate-50 border rounded-2xl py-3 sm:py-4 px-4 sm:px-6 text-slate-900 focus:outline-none focus:bg-white font-bold cursor-pointer text-sm sm:text-base",
+                      errors.weather ? "border-rose-500" : "border-slate-200 focus:border-marine-accent"
+                    )}
                   >
-                    <option>{t('calm')}</option>
-                    <option>{t('rough')}</option>
-                    <option>{t('stormy')}</option>
-                    <option>{t('clear')}</option>
+                    <option value="">{t('select_weather')}</option>
+                    <option value="Calm">{t('calm')}</option>
+                    <option value="Rough">{t('rough')}</option>
+                    <option value="Stormy">{t('stormy')}</option>
+                    <option value="Clear">{t('clear')}</option>
                   </select>
+                  {errors.weather && <p className="text-[10px] text-rose-500 font-bold uppercase tracking-widest ml-1">{errors.weather}</p>}
                 </div>
               </div>
 
@@ -567,18 +692,19 @@ export default function ReportForm() {
                   )}
 
                   <div className="flex items-center justify-center w-full">
-                    <label
+                      <label
                       htmlFor="camera-capture"
                       className={cn(
                         "flex items-center justify-center gap-3 w-full sm:w-auto px-6 sm:px-8 py-4 rounded-2xl font-black uppercase tracking-widest transition-all cursor-pointer shadow-lg active:scale-95 text-xs sm:text-sm",
                         formData.imageUrl
                           ? "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
-                          : "bg-marine-accent text-white hover:shadow-marine-accent/30"
+                          : (errors.image ? "bg-rose-500 text-white" : "bg-marine-accent text-white hover:shadow-marine-accent/30")
                       )}
                     >
                       <Camera size={24} className="shrink-0" />
                       <span className="truncate">{formData.imageUrl ? t('retake_photo') : t('open_camera')}</span>
                     </label>
+                    {errors.image && <p className="text-[10px] text-rose-500 font-bold uppercase tracking-widest ml-1">{errors.image}</p>}
                   </div>
                 </div>
               </div>
