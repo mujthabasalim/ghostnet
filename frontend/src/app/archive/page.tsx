@@ -142,7 +142,7 @@ export default function ArchivePage() {
               <thead>
                 <tr className="bg-slate-50/80 text-slate-400 text-[10px] uppercase tracking-widest font-black border-b border-slate-100">
                   <th className="px-8 py-5">Hazard ID</th>
-                  {/* <th className="px-8 py-5">Evidence (Before/After)</th> */}
+                  <th className="px-8 py-5">Evidence (Before/After)</th>
                   <th className="px-8 py-5">Net Type</th>
                   <th className="px-8 py-5">Location</th>
                   <th className="px-8 py-5">Retrieved By</th>
@@ -160,20 +160,20 @@ export default function ArchivePage() {
                     <td className="px-8 py-6 text-sm font-mono font-black text-slate-900">
                       GN-{net.id.substring(0, 5).toUpperCase()}
                     </td>
-                    {/* <td className="px-8 py-6">
+                    <td className="px-8 py-6">
                       <div className="flex -space-x-3 group-hover:space-x-1 transition-all duration-300">
-                        <div className="w-10 h-10 rounded-lg border-2 border-white bg-slate-100 overflow-hidden shadow-sm">
+                        <div className="w-10 h-10 rounded-lg border-2 border-white bg-slate-100 overflow-hidden shadow-sm relative">
                           {net.image_url && (
-                            <Image
+                            <img
                               src={net.image_url}
                               alt=""
                               className="w-full h-full object-cover"
                             />
                           )}
                         </div>
-                        <div className="w-10 h-10 rounded-lg border-2 border-white bg-slate-100 overflow-hidden shadow-sm">
+                        <div className="w-10 h-10 rounded-lg border-2 border-white bg-slate-100 overflow-hidden shadow-sm relative">
                           {net.retrieval_image_url && (
-                            <Image
+                            <img
                               src={net.retrieval_image_url}
                               alt=""
                               className="w-full h-full object-cover"
@@ -181,7 +181,7 @@ export default function ArchivePage() {
                           )}
                         </div>
                       </div>
-                    </td> */}
+                    </td>
                     <td className="px-8 py-6 text-sm text-slate-500 font-medium">
                       <span className="bg-slate-100 px-2 py-1 rounded text-[10px] font-black uppercase tracking-tight">
                         {net.net_type}
