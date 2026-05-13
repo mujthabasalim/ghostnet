@@ -46,7 +46,7 @@ export default function RetrievalsPage() {
     // Set up real-time subscription for missions
     const subscription = supabase
       .channel('mission-updates')
-      .on('postgres_changes', { event: '*', table: 'ghost_nets' }, () => {
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'ghost_nets' }, () => {
         fetchMissions();
       })
       .subscribe();
