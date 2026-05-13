@@ -99,21 +99,10 @@ export default function ArchivePage() {
         </div>
 
         <div className="glass-card overflow-hidden shadow-2xl">
-          <div className="p-4 sm:p-8 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-6 bg-white/40">
+          <div className="p-4 sm:p-8 border-b border-slate-100 bg-white/40">
             <h3 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight">
               {t('historical_reports')}
             </h3>
-            <div className="relative w-full md:w-80">
-              <Search
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
-                size={18}
-              />
-              <input
-                type="text"
-                placeholder="Filter by ID, Team, or Area..."
-                className="bg-slate-50 border border-slate-200 rounded-full py-3 pl-11 pr-6 text-sm focus:outline-none focus:border-marine-accent focus:bg-white focus:ring-4 focus:ring-marine-accent/10 w-full font-medium transition-all"
-              />
-            </div>
           </div>
 
           <div className="overflow-x-auto">
@@ -267,7 +256,7 @@ export default function ArchivePage() {
               {/* Certificate content for capture */}
               <div ref={certificateRef} className="flex flex-col md:flex-row w-full bg-white overflow-y-auto md:overflow-hidden">
                 {/* Image Section - Now Hero Focus on Retrieval */}
-                <div className="w-full md:w-1/2 bg-slate-950 p-1 flex flex-col items-stretch overflow-hidden shrink-0">
+                <div className="w-full md:w-1/2 bg-slate-950 p-1 flex flex-col items-stretch overflow-hidden shrink-0 order-last md:order-first">
                   <div className="flex-1 relative group overflow-hidden bg-slate-900 flex items-center justify-center min-h-[220px] sm:min-h-[300px] md:min-h-full">
                     {selectedCertificate.retrieval_image_url ? (
                       <img
@@ -318,7 +307,7 @@ export default function ArchivePage() {
                 </div>
 
                 {/* Details Section */}
-                <div className="w-full md:w-1/2 p-5 sm:p-10 flex flex-col justify-between bg-white relative min-w-0">
+                <div className="w-full md:w-1/2 p-5 sm:p-10 flex flex-col justify-between bg-white relative min-w-0 order-first md:order-last">
                   {/* Watermark */}
                   <div className="absolute inset-0 flex items-center justify-center opacity-[0.02] pointer-events-none rotate-12">
                     <Anchor size={400} />

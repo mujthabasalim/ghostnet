@@ -223,14 +223,16 @@ export default function RetrievalsPage() {
                       </div>
                     </div>
                     
-                    <div className={cn(
-                      "self-start sm:self-auto px-2.5 py-1 rounded text-[9px] sm:text-[10px] font-bold uppercase tracking-widest shrink-0",
-                      mission.status === "ACTIVE"
-                        ? "bg-rose-500/20 text-rose-500"
-                        : "bg-amber-500/20 text-amber-500",
-                    )}>
-                      {mission.status}
-                    </div>
+                    {!isSelected && (
+                      <div className={cn(
+                        "self-start sm:self-auto px-2.5 py-1 rounded text-[9px] sm:text-[10px] font-bold uppercase tracking-widest shrink-0",
+                        mission.status === "ACTIVE"
+                          ? "bg-rose-500/20 text-rose-500"
+                          : "bg-amber-500/20 text-amber-500",
+                      )}>
+                        {mission.status}
+                      </div>
+                    )}
                   </div>
 
                   {/* Navigation Action */}
@@ -251,29 +253,40 @@ export default function RetrievalsPage() {
               {/* Inline Expanded Details View */}
               {isSelected && (
                 <div className="glass-card p-4 sm:p-6 animate-in fade-in slide-in-from-top-2 duration-200 min-w-0 border-t-2 border-t-marine-accent bg-slate-50/30">
-                  <div className="flex items-center justify-between mb-4 sm:mb-6 gap-2">
-                    <h3 className="text-base sm:text-lg font-bold text-black">{t('mission_brief')}</h3>
-                    <div className="flex items-center gap-2 sm:gap-4 shrink-0">
-                      {/* Dev Simulation Toggle */}
-                      <label className="flex items-center gap-1.5 sm:gap-2 cursor-pointer bg-white px-2 py-1 rounded-lg border border-slate-200 shadow-sm">
-                        <input 
-                          type="checkbox" 
-                          className="sr-only peer" 
-                          checked={isDevMode}
-                          onChange={(e) => setIsDevMode(e.target.checked)}
-                        />
-                        <div className="w-6 sm:w-7 h-3.5 sm:h-4 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-2.5 sm:after:h-3 after:w-2.5 sm:after:w-3 after:transition-all peer-checked:bg-amber-500"></div>
-                        <span className="text-[7px] sm:text-[8px] font-black text-slate-500 uppercase tracking-tighter">SIM</span>
-                      </label>
-                      <button
-                        onClick={() => {
-                          setSelectedMission(null);
-                          setRetrievalImage(null);
-                        }}
-                        className="text-xs sm:text-sm text-slate-500 hover:text-black transition-colors font-medium"
-                      >
-                        {t('close')}
-                      </button>
+                  <div className="flex items-start justify-between mb-4 sm:mb-6 gap-2">
+                    <h3 className="text-base sm:text-lg font-bold text-black truncate mt-1">{t('mission_brief')}</h3>
+                    <div className="flex flex-col items-end gap-2 shrink-0">
+                      <div className="flex items-center gap-2 sm:gap-4">
+                        {/* Dev Simulation Toggle */}
+                        <label className="flex items-center gap-1.5 sm:gap-2 cursor-pointer bg-white px-2 py-1 rounded-lg border border-slate-200 shadow-sm">
+                          <input 
+                            type="checkbox" 
+                            className="sr-only peer" 
+                            checked={isDevMode}
+                            onChange={(e) => setIsDevMode(e.target.checked)}
+                          />
+                          <div className="w-6 sm:w-7 h-3.5 sm:h-4 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-2.5 sm:after:h-3 after:w-2.5 sm:after:w-3 after:transition-all peer-checked:bg-amber-500"></div>
+                          <span className="text-[7px] sm:text-[8px] font-black text-slate-500 uppercase tracking-tighter">SIM</span>
+                        </label>
+                        <button
+                          onClick={() => {
+                            setSelectedMission(null);
+                            setRetrievalImage(null);
+                          }}
+                          className="text-xs sm:text-sm text-slate-500 hover:text-black transition-colors font-medium"
+                        >
+                          {t('close')}
+                        </button>
+                      </div>
+                      {/* Single status badge positioned directly under the close option */}
+                      <div className={cn(
+                        "px-2.5 py-1 rounded text-[9px] sm:text-[10px] font-bold uppercase tracking-widest shadow-sm shrink-0",
+                        selectedMission.status === "ACTIVE"
+                          ? "bg-rose-500/20 text-rose-500"
+                          : "bg-amber-500/20 text-amber-500",
+                      )}>
+                        {selectedMission.status}
+                      </div>
                     </div>
                   </div>
 
@@ -341,75 +354,7 @@ export default function RetrievalsPage() {
                       </div>
                     </div>
                     
-                    {/* Navigation Brief */}
-                    {selectedMission.status === "IN_PROGRESS" && (
-                      <div className="space-y-2 min-w-0">
-                        <h4 className="text-[10px] sm:text-xs font-black text-slate-500 uppercase tracking-[0.2em] ml-1">
-                          {t('navigation_brief')}
-                        </h4>
-                        <div className="p-3 sm:p-4 bg-slate-900 text-white rounded-2xl shadow-xl overflow-hidden relative">
-                          {/* Background Decoration */}
-                          <div className="absolute -right-4 -bottom-4 opacity-10 rotate-12 pointer-events-none">
-                            <Navigation size={80} className="sm:w-[100px] sm:h-[100px]" />
-                          </div>
-
-                          {currentLocation ? (
-                            <div className="space-y-3 sm:space-y-4 relative z-10">
-                              <div className="flex items-center justify-between gap-2 min-w-0">
-                                <div className="space-y-0.5 sm:space-y-1 min-w-0">
-                                  <p className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest truncate">{t('distance_to_target')}</p>
-                                  <p className="text-xl sm:text-2xl font-black truncate">
-                                    {calculateDistance(
-                                      currentLocation.lat, 
-                                      currentLocation.lng, 
-                                      selectedMission.lat, 
-                                      selectedMission.lng
-                                    ).toFixed(2)} <span className="text-[10px] sm:text-xs text-slate-400">NM</span>
-                                  </p>
-                                </div>
-                                <div className="text-right space-y-0.5 sm:space-y-1 min-w-0">
-                                  <p className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest truncate">{t('bearing')}</p>
-                                  <p className="text-xl sm:text-2xl font-black truncate">
-                                    {calculateBearing(
-                                      currentLocation.lat, 
-                                      currentLocation.lng, 
-                                      selectedMission.lat, 
-                                      selectedMission.lng
-                                    ).toFixed(0)}° <span className="text-[10px] sm:text-xs text-slate-400">{getCardinalDirection(
-                                      calculateBearing(
-                                        currentLocation.lat, 
-                                        currentLocation.lng, 
-                                        selectedMission.lat, 
-                                        selectedMission.lng
-                                      )
-                                    )}</span>
-                                  </p>
-                                </div>
-                              </div>
-
-                              <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden">
-                                <div className="h-full bg-marine-accent w-1/3 animate-pulse" />
-                              </div>
-
-                              <a 
-                                href={`https://www.google.com/maps/dir/?api=1&destination=${selectedMission.lat},${selectedMission.lng}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="w-full bg-white text-slate-900 py-2.5 sm:py-3 rounded-xl font-black text-[10px] sm:text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-slate-100 transition-all shadow-sm"
-                              >
-                                <ExternalLink size={14} className="shrink-0" /> <span className="truncate">{t('open_external_maps')}</span>
-                              </a>
-                            </div>
-                          ) : (
-                            <div className="py-3 sm:py-4 flex flex-col items-center gap-2 sm:gap-3">
-                              <div className="w-6 h-6 sm:w-8 sm:h-8 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-                              <p className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest animate-pulse text-center">{t('acquiring_intercept')}</p>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
-
+                    {/* Mission Initialization / Actions */}
                     {selectedMission.status === "ACTIVE" ? (
                       <button 
                         onClick={() => updateStatus(selectedMission.id, 'IN_PROGRESS')}
@@ -423,7 +368,161 @@ export default function RetrievalsPage() {
                       >
                           <span className="truncate">{session ? t('initialize_mission') : t('sign_in_initialize')}</span> <ShieldCheck size={18} className="shrink-0" />
                       </button>
+                    ) : selectedMission.status === "IN_PROGRESS" ? (
+                      <div className="space-y-4 sm:space-y-6 min-w-0">
+                        {/* Two column layout on large screens for Distance & Open Camera */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 min-w-0 items-start">
+                          {/* Column 1: Navigation Brief */}
+                          <div className="space-y-2 min-w-0 w-full">
+                            <h4 className="text-[10px] sm:text-xs font-black text-slate-500 uppercase tracking-[0.2em] ml-1">
+                              {t('navigation_brief')}
+                            </h4>
+                            <div className="p-3 sm:p-4 bg-slate-900 text-white rounded-2xl shadow-xl overflow-hidden relative flex flex-col justify-between min-h-[140px] sm:min-h-[160px]">
+                              {/* Background Decoration */}
+                              <div className="absolute -right-4 -bottom-4 opacity-10 rotate-12 pointer-events-none">
+                                <Navigation size={80} className="sm:w-[100px] sm:h-[100px]" />
+                              </div>
+
+                              {currentLocation ? (
+                                <div className="space-y-3 sm:space-y-4 relative z-10 flex-1 flex flex-col justify-between min-w-0">
+                                  <div className="flex items-center justify-between gap-2 min-w-0">
+                                    <div className="space-y-0.5 sm:space-y-1 min-w-0">
+                                      <p className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest truncate">{t('distance_to_target')}</p>
+                                      <p className="text-xl sm:text-2xl font-black truncate">
+                                        {calculateDistance(
+                                          currentLocation.lat, 
+                                          currentLocation.lng, 
+                                          selectedMission.lat, 
+                                          selectedMission.lng
+                                        ).toFixed(2)} <span className="text-[10px] sm:text-xs text-slate-400">NM</span>
+                                      </p>
+                                    </div>
+                                    <div className="text-right space-y-0.5 sm:space-y-1 min-w-0">
+                                      <p className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest truncate">{t('bearing')}</p>
+                                      <p className="text-xl sm:text-2xl font-black truncate">
+                                        {calculateBearing(
+                                          currentLocation.lat, 
+                                          currentLocation.lng, 
+                                          selectedMission.lat, 
+                                          selectedMission.lng
+                                        ).toFixed(0)}° <span className="text-[10px] sm:text-xs text-slate-400">{getCardinalDirection(
+                                          calculateBearing(
+                                            currentLocation.lat, 
+                                            currentLocation.lng, 
+                                            selectedMission.lat, 
+                                            selectedMission.lng
+                                          )
+                                        )}</span>
+                                      </p>
+                                    </div>
+                                  </div>
+
+                                  <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden my-1">
+                                    <div className="h-full bg-marine-accent w-1/3 animate-pulse" />
+                                  </div>
+
+                                  <a 
+                                    href={`https://www.google.com/maps/dir/?api=1&destination=${selectedMission.lat},${selectedMission.lng}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="w-full bg-white text-slate-900 py-2 sm:py-2.5 rounded-xl font-black text-[10px] sm:text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-slate-100 transition-all shadow-sm shrink-0 mt-auto"
+                                  >
+                                    <ExternalLink size={14} className="shrink-0" /> <span className="truncate">{t('open_external_maps')}</span>
+                                  </a>
+                                </div>
+                              ) : (
+                                <div className="py-6 flex flex-col items-center justify-center gap-2 sm:gap-3 flex-1">
+                                  <div className="w-6 h-6 sm:w-8 sm:h-8 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                                  <p className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest animate-pulse text-center">{t('acquiring_intercept')}</p>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Column 2: Retrieval Evidence UI */}
+                          <div className="space-y-2 min-w-0 w-full">
+                            <h4 className="text-[10px] sm:text-xs font-black text-slate-500 uppercase tracking-[0.2em] ml-1">
+                              {t('retrieval_evidence')}
+                            </h4>
+                            <div className="relative group flex flex-col justify-center min-h-[140px] sm:min-h-[160px]">
+                              {retrievalImage ? (
+                                <div className="relative rounded-2xl overflow-hidden border-2 border-emerald-500 w-full h-full aspect-video sm:aspect-auto flex-1 group">
+                                  <img src={retrievalImage} alt="Evidence" className="w-full h-full object-cover absolute inset-0" />
+                                  <div className="absolute inset-0 bg-emerald-500/20 flex items-center justify-center">
+                                    <CheckCircle2 className="text-white drop-shadow-lg w-10 h-10 sm:w-12 sm:h-12" />
+                                  </div>
+                                  <button 
+                                    onClick={() => setRetrievalImage(null)}
+                                    className="absolute top-2 right-2 p-2 bg-black/50 text-white rounded-full opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                                  >
+                                    <Camera size={14} className="sm:w-4 sm:h-4" />
+                                  </button>
+                                </div>
+                              ) : (
+                                <label className="flex flex-col items-center justify-center w-full h-full min-h-[140px] sm:min-h-[160px] border-2 border-dashed border-slate-200 rounded-2xl bg-white hover:bg-slate-50 transition-colors cursor-pointer p-4 text-center shadow-sm flex-1">
+                                  <input 
+                                    type="file" 
+                                    accept="image/*" 
+                                    capture="environment" 
+                                    className="hidden" 
+                                    onChange={handleImageCapture}
+                                    disabled={isUploading}
+                                  />
+                                  {isUploading ? (
+                                    <div className="flex flex-col items-center gap-2">
+                                      <div className="w-5 h-5 sm:w-6 sm:h-6 border-2 border-marine-accent border-t-transparent rounded-full animate-spin" />
+                                      <span className="text-[9px] sm:text-[10px] font-black text-marine-accent uppercase">{t('uploading')}</span>
+                                    </div>
+                                  ) : (
+                                    <>
+                                      <Camera className="text-slate-400 mb-1.5 sm:mb-2 w-6 h-6 sm:w-8 sm:h-8" />
+                                      <span className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('capture_proof')}</span>
+                                    </>
+                                  )}
+                                </label>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Proximity Warning / Submit Action spanning full width */}
+                        <div className="min-w-0">
+                          {(() => {
+                            const dist = currentLocation ? calculateDistance(
+                              currentLocation.lat, currentLocation.lng, 
+                              selectedMission.lat, selectedMission.lng
+                            ) : 999;
+                            const isOnSite = dist <= PROXIMITY_THRESHOLD;
+
+                            return (
+                              <button 
+                                onClick={() => updateStatus(selectedMission.id, 'RETRIEVED', {
+                                  retrieval_image_url: retrievalImage,
+                                  retrieval_lat: currentLocation?.lat,
+                                  retrieval_lng: currentLocation?.lng
+                                })}
+                                disabled={!session || (!isOnSite && !isDevMode) || !retrievalImage}
+                                className={cn(
+                                  "w-full font-bold py-3 sm:py-4 px-3 rounded-xl flex items-center justify-center gap-1.5 sm:gap-2 transition-all text-xs sm:text-sm",
+                                  session && (isOnSite || isDevMode) && retrievalImage
+                                    ? "bg-emerald-500 text-white hover:shadow-[0_0_20px_rgba(16,185,129,0.3)] shadow-lg" 
+                                    : "bg-slate-100 text-slate-400 cursor-not-allowed"
+                                )}
+                              >
+                                {!retrievalImage ? (
+                                  <><span className="truncate">{t('evidence_required')}</span> <Camera size={16} className="shrink-0" /></>
+                                ) : (!isOnSite && !isDevMode) ? (
+                                  <><span className="truncate">{t('too_far')} ({dist.toFixed(1)} NM)</span> <Anchor size={16} className="shrink-0" /></>
+                                ) : (
+                                  <><span className="truncate">{t('complete_retrieval')}</span> <CheckCircle2 size={16} className="shrink-0" /></>
+                                )}
+                              </button>
+                            );
+                          })()}
+                        </div>
+                      </div>
                     ) : (
+                      /* When status is RETRIEVED */
                       <div className="space-y-3 sm:space-y-4 min-w-0">
                         {/* Retrieval Evidence UI */}
                         <div className="space-y-2 min-w-0">
@@ -431,78 +530,21 @@ export default function RetrievalsPage() {
                             {t('retrieval_evidence')}
                           </h4>
                           <div className="relative group">
-                            {retrievalImage ? (
+                            {selectedMission.retrieval_image_url || retrievalImage ? (
                               <div className="relative rounded-2xl overflow-hidden border-2 border-emerald-500 aspect-video group">
-                                <img src={retrievalImage} alt="Evidence" className="w-full h-full object-cover" />
+                                <img src={selectedMission.retrieval_image_url || retrievalImage} alt="Evidence" className="w-full h-full object-cover" />
                                 <div className="absolute inset-0 bg-emerald-500/20 flex items-center justify-center">
                                   <CheckCircle2 className="text-white drop-shadow-lg w-10 h-10 sm:w-12 sm:h-12" />
                                 </div>
-                                <button 
-                                  onClick={() => setRetrievalImage(null)}
-                                  className="absolute top-2 right-2 p-2 bg-black/50 text-white rounded-full opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity"
-                                >
-                                  <Camera size={14} className="sm:w-4 sm:h-4" />
-                                </button>
                               </div>
                             ) : (
-                              <label className="flex flex-col items-center justify-center w-full h-24 sm:h-32 border-2 border-dashed border-slate-200 rounded-2xl bg-white hover:bg-slate-50 transition-colors cursor-pointer p-4 text-center shadow-sm">
-                                <input 
-                                  type="file" 
-                                  accept="image/*" 
-                                  capture="environment" 
-                                  className="hidden" 
-                                  onChange={handleImageCapture}
-                                  disabled={isUploading}
-                                />
-                                {isUploading ? (
-                                  <div className="flex flex-col items-center gap-2">
-                                    <div className="w-5 h-5 sm:w-6 sm:h-6 border-2 border-marine-accent border-t-transparent rounded-full animate-spin" />
-                                    <span className="text-[9px] sm:text-[10px] font-black text-marine-accent uppercase">{t('uploading')}</span>
-                                  </div>
-                                ) : (
-                                  <>
-                                    <Camera className="text-slate-400 mb-1.5 sm:mb-2 w-6 h-6 sm:w-8 sm:h-8" />
-                                    <span className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('capture_proof')}</span>
-                                  </>
-                                )}
-                              </label>
+                              <div className="flex flex-col items-center justify-center w-full h-24 sm:h-32 border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50 p-4 text-center">
+                                <CheckCircle2 className="text-emerald-500 mb-1 sm:mb-2 w-6 h-6 sm:w-8 sm:h-8" />
+                                <span className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('status_retrieved')}</span>
+                              </div>
                             )}
                           </div>
                         </div>
-
-                        {/* Proximity Warning */}
-                        {(() => {
-                          const dist = currentLocation ? calculateDistance(
-                            currentLocation.lat, currentLocation.lng, 
-                            selectedMission.lat, selectedMission.lng
-                          ) : 999;
-                          const isOnSite = dist <= PROXIMITY_THRESHOLD;
-
-                          return (
-                            <button 
-                              onClick={() => updateStatus(selectedMission.id, 'RETRIEVED', {
-                                retrieval_image_url: retrievalImage,
-                                retrieval_lat: currentLocation?.lat,
-                                retrieval_lng: currentLocation?.lng
-                              })}
-                              disabled={!session || (!isOnSite && !isDevMode) || !retrievalImage}
-                              className={cn(
-                                "w-full font-bold py-3 sm:py-4 px-3 rounded-xl flex items-center justify-center gap-1.5 sm:gap-2 transition-all text-xs sm:text-sm",
-                                session && (isOnSite || isDevMode) && retrievalImage
-                                  ? "bg-emerald-500 text-white hover:shadow-[0_0_20px_rgba(16,185,129,0.3)] shadow-lg" 
-                                  : "bg-slate-100 text-slate-400 cursor-not-allowed"
-                              )}
-                            >
-                              {!retrievalImage ? (
-                                <><span className="truncate">{t('evidence_required')}</span> <Camera size={16} className="shrink-0" /></>
-                              ) : (!isOnSite && !isDevMode) ? (
-                                <><span className="truncate">{t('too_far')} ({dist.toFixed(1)} NM)</span> <Anchor size={16} className="shrink-0" /></>
-                              ) : (
-                                <><span className="truncate">{t('complete_retrieval')}</span> <CheckCircle2 size={16} className="shrink-0" /></>
-                              )}
-                            </button>
-                          );
-                        })()}
                       </div>
                     )}
                     
