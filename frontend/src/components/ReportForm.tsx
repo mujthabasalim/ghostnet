@@ -20,6 +20,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import { Lock } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
 
 const LocationMap = dynamic(() => import("./map/LocationMap"), { ssr: false });
 
@@ -45,6 +46,7 @@ const suggestSeaArea = (lat: number, lng: number) => {
 
 export default function ReportForm() {
   const [step, setStep] = useState(1);
+  const { t } = useLanguage();
   const [formData, setFormData] = useState({
     netType: "Gill Net",
     length: "",
@@ -181,10 +183,10 @@ export default function ReportForm() {
       <div className="mb-10">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-3xl font-black text-slate-900 tracking-tight">
-            Report Lost Net
+            {t('report_lost_net')}
           </h2>
           <span className="text-sm text-slate-400 font-bold uppercase tracking-widest">
-            STEP {step} OF 3
+            {t('step_1_of_3').replace('1', step.toString())}
           </span>
         </div>
         <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden shadow-inner">
@@ -235,17 +237,17 @@ export default function ReportForm() {
               </div>
               <div className="space-y-3">
                 <h3 className="text-3xl font-black text-slate-900 tracking-tight">
-                  Report Transmitted
+                  {t('report_transmitted')}
                 </h3>
                 <p className="text-slate-500 text-lg">
-                  Hazard ID generated. Nearby vessels have been notified.
+                  {t('hazard_id_generated')}
                 </p>
               </div>
-              <button
+                <button
                 onClick={() => (window.location.href = "/dashboard")}
                 className="bg-slate-900 text-white px-10 py-4 rounded-2xl font-bold text-lg hover:bg-slate-800 transition-all shadow-xl hover:shadow-2xl hover:scale-105"
               >
-                Return to Command Center
+                {t('return_dashboard')}
               </button>
             </motion.div>
           ) : step === 1 ? (
@@ -260,7 +262,7 @@ export default function ReportForm() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-3">
                   <label className="text-xs font-black text-slate-500 uppercase tracking-[0.2em]">
-                    Net Type
+                    {t('net_type')}
                   </label>
                   <div className="grid grid-cols-2 gap-3">
                     {NET_TYPES.map((type) => (
@@ -277,7 +279,9 @@ export default function ReportForm() {
                             : "bg-slate-50 border-slate-200 text-slate-600 hover:border-marine-accent/50 hover:bg-white",
                         )}
                       >
-                        {type}
+                        {type === "Gill Net" ? t('gill_net') : 
+                         type === "Trawl Net" ? t('trawl_net') : 
+                         type === "Drift Net" ? t('drift_net') : t('other')}
                       </button>
                     ))}
                   </div>
@@ -285,7 +289,7 @@ export default function ReportForm() {
 
                 <div className="space-y-3">
                   <label className="text-xs font-black text-slate-500 uppercase tracking-[0.2em]">
-                    Net Length (Meters)
+                    {t('net_length')}
                   </label>
                   <input
                     type="number"
@@ -312,7 +316,7 @@ export default function ReportForm() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-3">
                   <label className="text-xs font-black text-slate-500 uppercase tracking-[0.2em]">
-                    Float Color
+                    {t('float_color')}
                   </label>
                   <input
                     type="text"
@@ -326,7 +330,7 @@ export default function ReportForm() {
                 </div>
                 <div className="space-y-3">
                   <label className="text-xs font-black text-slate-500 uppercase tracking-[0.2em]">
-                    Float Description
+                    {t('float_description')}
                   </label>
                   <input
                     type="text"
@@ -345,7 +349,7 @@ export default function ReportForm() {
                   onClick={nextStep}
                   className="bg-marine-accent text-white font-black px-10 py-4 rounded-2xl flex items-center gap-3 hover:shadow-2xl hover:shadow-marine-accent/30 transition-all hover:scale-105 active:scale-95 group"
                 >
-                  Next: Location Details{" "}
+                  {t('next_step')}: {t('location_details')}{" "}
                   <ArrowRight
                     size={22}
                     className="group-hover:translate-x-1 transition-transform"
@@ -367,7 +371,7 @@ export default function ReportForm() {
                   <div className="h-full flex flex-col items-center justify-center gap-4 bg-slate-50">
                     <div className="w-12 h-12 border-4 border-marine-accent/20 border-t-marine-accent rounded-full animate-spin" />
                     <p className="text-sm font-black text-slate-900 uppercase tracking-widest animate-pulse">
-                      Acquiring Satellite Lock...
+                      {t('acquiring_gps')}
                     </p>
                   </div>
                 ) : formData.lat && formData.lng ? (
@@ -380,7 +384,7 @@ export default function ReportForm() {
                       <button 
                         onClick={getLocation}
                         className="bg-white/90 backdrop-blur-sm p-3 rounded-xl shadow-lg border border-slate-200 text-marine-accent hover:scale-105 active:scale-95 transition-all"
-                        title="Refresh Location"
+                        title={t('refresh_location')}
                       >
                         <Compass size={20} className="animate-pulse" />
                       </button>
@@ -393,7 +397,7 @@ export default function ReportForm() {
                       onClick={getLocation}
                       className="bg-marine-accent text-white px-6 py-3 rounded-xl font-bold hover:shadow-lg transition-all"
                     >
-                      Initialize GPS Lock
+                      {t('gps_initialize')}
                     </button>
                   </div>
                 )}
@@ -401,12 +405,12 @@ export default function ReportForm() {
 
               <div className="flex items-center justify-center gap-8 py-2">
                 <div className="text-center">
-                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Latitude</p>
+                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">{t('latitude')}</p>
                   <p className="text-lg font-mono font-black text-slate-900">{formData.lat || "---"}</p>
                 </div>
                 <div className="w-px h-8 bg-slate-200" />
                 <div className="text-center">
-                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Longitude</p>
+                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">{t('longitude')}</p>
                   <p className="text-lg font-mono font-black text-slate-900">{formData.lng || "---"}</p>
                 </div>
               </div>
@@ -418,8 +422,8 @@ export default function ReportForm() {
                       <AlertCircle size={18} />
                     </div>
                     <div>
-                      <p className="text-sm font-black text-amber-900 uppercase tracking-tight">Spatial Integrity</p>
-                      <p className="text-xs text-amber-700 font-medium">Reporting from land is restricted in production.</p>
+                      <p className="text-sm font-black text-amber-900 uppercase tracking-tight">{t('spatial_integrity')}</p>
+                      <p className="text-xs text-amber-700 font-medium">{t('spatial_integrity_msg')}</p>
                     </div>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
@@ -430,7 +434,7 @@ export default function ReportForm() {
                       onChange={(e) => setFormData({...formData, isDevReport: e.target.checked})}
                     />
                     <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
-                    <span className="ml-3 text-xs font-black text-amber-900 uppercase tracking-widest">Simulation Mode</span>
+                    <span className="ml-3 text-xs font-black text-amber-900 uppercase tracking-widest">{t('simulation_mode')}</span>
                   </label>
                 </div>
               </div>
@@ -439,13 +443,13 @@ export default function ReportForm() {
 
               <div className="space-y-3">
                 <label className="text-xs font-black text-slate-500 uppercase tracking-[0.2em]">
-                  Sea Area Name
+                  {t('sea_area_name')}
                 </label>
                 <input
                   type="text"
                   value={formData.areaName}
                   onChange={(e) => setFormData({ ...formData, areaName: e.target.value })}
-                  placeholder="e.g. Bay of Bengal - Sector 4"
+                  placeholder={t('eg_bay_of_bengal')}
                   className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 px-6 text-slate-900 focus:outline-none focus:border-marine-accent focus:bg-white transition-all font-bold"
                 />
               </div>
@@ -455,13 +459,13 @@ export default function ReportForm() {
                   onClick={prevStep}
                   className="text-slate-400 font-black px-10 py-4 rounded-2xl flex items-center gap-3 hover:bg-slate-100 transition-all"
                 >
-                  <ChevronLeft size={22} /> Back
+                  <ChevronLeft size={22} /> {t('back')}
                 </button>
                 <button
                   onClick={nextStep}
                   className="bg-marine-accent text-white font-black px-10 py-4 rounded-2xl flex items-center gap-3 hover:shadow-2xl hover:shadow-marine-accent/30 transition-all hover:scale-105 active:scale-95 group"
                 >
-                  Next: Additional Info{" "}
+                  {t('next_step')}: {t('additional_info')}{" "}
                   <ArrowRight
                     size={22}
                     className="group-hover:translate-x-1 transition-transform"
@@ -481,7 +485,7 @@ export default function ReportForm() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-3">
                   <label className="text-xs font-black text-slate-500 uppercase tracking-[0.2em]">
-                    Estimated Depth (Meters)
+                    {t('estimated_depth')}
                   </label>
                   <input
                     type="number"
@@ -494,7 +498,7 @@ export default function ReportForm() {
                 </div>
                 <div className="space-y-3">
                   <label className="text-xs font-black text-slate-500 uppercase tracking-[0.2em]">
-                    Weather Condition
+                    {t('weather_condition')}
                   </label>
                   <select
                     value={formData.weather}
@@ -503,17 +507,17 @@ export default function ReportForm() {
                     }
                     className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 px-6 text-slate-900 focus:outline-none focus:border-marine-accent font-bold cursor-pointer"
                   >
-                    <option>Calm</option>
-                    <option>Rough</option>
-                    <option>Stormy</option>
-                    <option>Clear</option>
+                    <option>{t('calm')}</option>
+                    <option>{t('rough')}</option>
+                    <option>{t('stormy')}</option>
+                    <option>{t('clear')}</option>
                   </select>
                 </div>
               </div>
 
               <div className="space-y-3">
                 <label className="text-xs font-black text-slate-500 uppercase tracking-[0.2em]">
-                  Evidence Capture
+                  {t('evidence_capture')}
                 </label>
                 <div className="flex flex-col gap-6">
                   <input
@@ -541,8 +545,8 @@ export default function ReportForm() {
                             <CheckCircle2 size={24} />
                           </div>
                           <div>
-                            <p className="text-white font-black uppercase tracking-widest text-xs">Image Verified</p>
-                            <p className="text-white/70 text-[10px] font-medium">Metadata attached for validation</p>
+                            <p className="text-white font-black uppercase tracking-widest text-xs">{t('image_verified')}</p>
+                            <p className="text-white/70 text-[10px] font-medium">{t('metadata_attached')}</p>
                           </div>
                         </div>
                       </div>
@@ -558,7 +562,7 @@ export default function ReportForm() {
                       <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-sm border border-slate-100">
                         <Camera className="text-slate-300" size={32} />
                       </div>
-                      <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">No evidence captured yet</p>
+                      <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">{t('no_evidence')}</p>
                     </div>
                   )}
 
@@ -573,7 +577,7 @@ export default function ReportForm() {
                       )}
                     >
                       <Camera size={24} />
-                      {formData.imageUrl ? "Retake Photo" : "Open Camera"}
+                      {formData.imageUrl ? t('retake_photo') : t('open_camera')}
                     </label>
                   </div>
                 </div>
@@ -581,7 +585,7 @@ export default function ReportForm() {
 
               <div className="space-y-3">
                 <label className="text-xs font-black text-slate-500 uppercase tracking-[0.2em]">
-                  Notes / Comments
+                  {t('notes_comments')}
                 </label>
                 <textarea
                   rows={4}
@@ -590,7 +594,7 @@ export default function ReportForm() {
                     setFormData({ ...formData, notes: e.target.value })
                   }
                   className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 px-6 text-slate-900 focus:outline-none focus:border-marine-accent focus:bg-white transition-all font-medium"
-                  placeholder="Describe surroundings, drift direction, or any other details..."
+                  placeholder={t('notes_placeholder')}
                 />
               </div>
 
@@ -610,7 +614,7 @@ export default function ReportForm() {
                   disabled={loading}
                   className="text-slate-400 font-black px-10 py-4 rounded-2xl flex items-center gap-3 hover:bg-slate-100 transition-all disabled:opacity-50"
                 >
-                  <ChevronLeft size={22} /> Back
+                  <ChevronLeft size={22} /> {t('back')}
                 </button>
                 <button
                   onClick={handleSubmit}
@@ -620,11 +624,11 @@ export default function ReportForm() {
                   {loading ? (
                     <>
                       <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      Transmitting...
+                      {t('transmitting')}
                     </>
                   ) : (
                     <>
-                      Submit Hazard Report <CheckCircle2 size={22} />
+                      {t('submit_hazard_report')} <CheckCircle2 size={22} />
                     </>
                   )}
                 </button>

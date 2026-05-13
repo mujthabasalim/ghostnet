@@ -22,8 +22,10 @@ import { supabase } from "@/lib/supabase";
 import { Lock } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { calculateDistance, calculateBearing, getCardinalDirection } from "@/lib/navigation-utils";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function RetrievalsPage() {
+  const { t } = useLanguage();
   const [missions, setMissions] = useState<any[]>([]);
   const [selectedMission, setSelectedMission] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -144,20 +146,20 @@ export default function RetrievalsPage() {
     <div className="space-y-8 max-w-7xl mx-auto">
       <div className="flex flex-col gap-2">
         <h1 className="text-3xl font-bold tracking-tight text-black">
-          Retrieval Missions
+          {t('retrieval_missions')}
         </h1>
         <p className="text-slate-400">
-          Manage and execute ghost net recovery operations.
+          {t('manage_ghost_nets')}
         </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-4">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-black">Open Missions</h3>
+            <h3 className="text-lg font-semibold text-black">{t('open_missions')}</h3>
             <div className="flex gap-2">
               <span className="px-2 py-1 bg-marine-100 rounded text-[10px] font-bold text-marine-700 uppercase tracking-widest">
-                Filter: All
+                {t('filter_all')}
               </span>
             </div>
           </div>
@@ -228,11 +230,11 @@ export default function RetrievalsPage() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-16 border-l border-slate-100 flex flex-col items-center justify-center gap-1 text-slate-400 hover:bg-marine-accent hover:text-white transition-all group/nav"
-                  title="Navigate to Hazard"
+                  title={t('navigate_to_hazard')}
                   onClick={(e) => e.stopPropagation()}
                 >
                   <Navigation size={20} className="group-hover/nav:animate-pulse" />
-                  <span className="text-[8px] font-black uppercase tracking-tighter">Route</span>
+                  <span className="text-[8px] font-black uppercase tracking-tighter">{t('route')}</span>
                 </a>
               </div>
             </div>
@@ -240,7 +242,7 @@ export default function RetrievalsPage() {
           {missions.length === 0 && !loading && (
             <div className="py-20 text-center glass-card border-dashed opacity-50">
               <CheckCircle2 className="mx-auto mb-4 text-emerald-500" size={48} />
-              <p className="text-slate-500 font-bold uppercase tracking-widest">All hazards cleared</p>
+              <p className="text-slate-500 font-bold uppercase tracking-widest">{t('all_hazards_cleared')}</p>
             </div>
           )}
         </div>
@@ -250,7 +252,7 @@ export default function RetrievalsPage() {
           {selectedMission ? (
             <div className="glass-card p-6 sticky top-24 animate-in fade-in slide-in-from-bottom-4 duration-300">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-bold text-black">Mission Brief</h3>
+                <h3 className="text-xl font-bold text-black">{t('mission_brief')}</h3>
                 <div className="flex items-center gap-4">
                   {/* Dev Simulation Toggle */}
                   <label className="flex items-center gap-2 cursor-pointer bg-slate-100 px-2 py-1 rounded-lg border border-slate-200">
@@ -270,7 +272,7 @@ export default function RetrievalsPage() {
                     }}
                     className="text-slate-500 hover:text-black transition-colors"
                   >
-                    Close
+                    {t('close')}
                   </button>
                 </div>
               </div>
@@ -278,19 +280,19 @@ export default function RetrievalsPage() {
               <div className="space-y-6">
                 <div className="p-4 bg-marine-950/50 rounded-xl border border-marine-700/30 space-y-3">
                   <div className="flex justify-between text-sm">
-                    <span className="text-slate-500">Hazard ID</span>
+                    <span className="text-slate-500">{t('hazard_id')}</span>
                     <span className="text-black font-mono">
                       GN-{selectedMission.id.substring(0, 8).toUpperCase()}
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-slate-500">Radius</span>
+                    <span className="text-slate-500">{t('radius')}</span>
                     <span className="text-black">
                       {selectedMission.radius}m
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-slate-500">Location</span>
+                    <span className="text-slate-500">{t('location')}</span>
                     <span className="text-black">
                       {selectedMission.area_name || `${selectedMission.lat}, ${selectedMission.lng}`}
                     </span>
@@ -300,7 +302,7 @@ export default function RetrievalsPage() {
                 {/* Reporter Details */}
                 <div className="space-y-3">
                   <h4 className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] ml-1">
-                    Reporter Information
+                    {t('reporter_information')}
                   </h4>
                   <div className="p-4 bg-white border border-slate-100 rounded-xl shadow-sm space-y-4">
                     {selectedMission.reporter ? (
@@ -311,19 +313,19 @@ export default function RetrievalsPage() {
                           </div>
                           <div>
                             <p className="text-sm font-black text-slate-900">{selectedMission.reporter.full_name}</p>
-                            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Verified Guardian</p>
+                            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{t('verified_guardian')}</p>
                           </div>
                         </div>
                         
                         <div className="grid grid-cols-2 gap-4 pt-2 border-t border-slate-50">
                           <div>
-                            <p className="text-[9px] text-slate-400 font-black uppercase tracking-widest mb-1">Mobile</p>
+                            <p className="text-[9px] text-slate-400 font-black uppercase tracking-widest mb-1">{t('mobile')}</p>
                             <p className="text-xs font-bold text-slate-700 flex items-center gap-1">
                               <Phone size={12} /> {selectedMission.reporter.mobile}
                             </p>
                           </div>
                           <div>
-                            <p className="text-[9px] text-slate-400 font-black uppercase tracking-widest mb-1">Govt ID</p>
+                            <p className="text-[9px] text-slate-400 font-black uppercase tracking-widest mb-1">{t('govt_id')}</p>
                             <p className="text-xs font-bold text-slate-700 flex items-center gap-1">
                               <ShieldIcon size={12} /> {selectedMission.reporter.id_code}
                             </p>
@@ -333,7 +335,7 @@ export default function RetrievalsPage() {
                     ) : (
                       <div className="flex items-center gap-2 text-slate-400 italic py-2">
                         <AlertCircle size={16} />
-                        <p className="text-xs">Reporter data unavailable for this hazard.</p>
+                        <p className="text-xs">{t('reporter_data_unavailable')}</p>
                       </div>
                     )}
                   </div>
@@ -343,7 +345,7 @@ export default function RetrievalsPage() {
                 {selectedMission.status === "IN_PROGRESS" && (
                   <div className="space-y-3">
                     <h4 className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] ml-1">
-                      Navigation Brief
+                      {t('navigation_brief')}
                     </h4>
                     <div className="p-4 bg-slate-900 text-white rounded-2xl shadow-xl overflow-hidden relative">
                       {/* Background Decoration */}
@@ -355,7 +357,7 @@ export default function RetrievalsPage() {
                         <div className="space-y-4 relative z-10">
                           <div className="flex items-center justify-between">
                             <div className="space-y-1">
-                              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Distance to Target</p>
+                              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('distance_to_target')}</p>
                               <p className="text-2xl font-black">
                                 {calculateDistance(
                                   currentLocation.lat, 
@@ -366,7 +368,7 @@ export default function RetrievalsPage() {
                               </p>
                             </div>
                             <div className="text-right space-y-1">
-                              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Bearing</p>
+                              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('bearing')}</p>
                               <p className="text-2xl font-black">
                                 {calculateBearing(
                                   currentLocation.lat, 
@@ -395,13 +397,13 @@ export default function RetrievalsPage() {
                             rel="noopener noreferrer"
                             className="w-full bg-white text-slate-900 py-3 rounded-xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-slate-100 transition-all"
                           >
-                            <ExternalLink size={14} /> Open in External Maps
+                            <ExternalLink size={14} /> {t('open_external_maps')}
                           </a>
                         </div>
                       ) : (
                         <div className="py-4 flex flex-col items-center gap-3">
                           <div className="w-8 h-8 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest animate-pulse">Acquiring Intercept Coordinates...</p>
+                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest animate-pulse">{t('acquiring_intercept')}</p>
                         </div>
                       )}
                     </div>
@@ -419,14 +421,14 @@ export default function RetrievalsPage() {
                         : "bg-slate-100 text-slate-400 cursor-not-allowed"
                     )}
                   >
-                    {session ? 'Initialize Mission' : 'Sign in to Initialize'} <ShieldCheck size={20} />
+                      {session ? t('initialize_mission') : t('sign_in_initialize')} <ShieldCheck size={20} />
                   </button>
                 ) : (
                   <div className="space-y-4">
                     {/* Retrieval Evidence UI */}
                     <div className="space-y-3">
                       <h4 className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] ml-1">
-                        Retrieval Evidence
+                        {t('retrieval_evidence')}
                       </h4>
                       <div className="relative group">
                         {retrievalImage ? (
@@ -455,12 +457,12 @@ export default function RetrievalsPage() {
                             {isUploading ? (
                               <div className="flex flex-col items-center gap-2">
                                 <div className="w-6 h-6 border-2 border-marine-accent border-t-transparent rounded-full animate-spin" />
-                                <span className="text-[10px] font-black text-marine-accent uppercase">Uploading...</span>
+                                <span className="text-[10px] font-black text-marine-accent uppercase">{t('uploading')}</span>
                               </div>
                             ) : (
                               <>
                                 <Camera className="text-slate-400 mb-2" size={32} />
-                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Capture Proof of Retrieval</span>
+                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('capture_proof')}</span>
                               </>
                             )}
                           </label>
@@ -492,11 +494,11 @@ export default function RetrievalsPage() {
                           )}
                         >
                           {!retrievalImage ? (
-                            <>Evidence Required <Camera size={20} /></>
+                            <>{t('evidence_required')} <Camera size={20} /></>
                           ) : (!isOnSite && !isDevMode) ? (
-                            <>Too Far From Site ({dist.toFixed(1)} NM) <Anchor size={20} /></>
+                            <>{t('too_far')} ({dist.toFixed(1)} NM) <Anchor size={20} /></>
                           ) : (
-                            <>Complete Retrieval <CheckCircle2 size={20} /></>
+                            <>{t('complete_retrieval')} <CheckCircle2 size={20} /></>
                           )}
                         </button>
                       );
@@ -507,7 +509,7 @@ export default function RetrievalsPage() {
                 {!session && (
                   <div className="p-4 bg-amber-50 border border-amber-100 rounded-xl flex items-center gap-3">
                     <Lock size={16} className="text-amber-500" />
-                    <p className="text-[10px] font-black text-amber-700 uppercase tracking-widest">Authorization required for field ops</p>
+                    <p className="text-[10px] font-black text-amber-700 uppercase tracking-widest">{t('authorization_required')}</p>
                   </div>
                 )}
               </div>
@@ -516,7 +518,7 @@ export default function RetrievalsPage() {
             <div className="glass-card p-10 flex flex-col items-center justify-center text-center opacity-50 border-dashed">
               <ShieldCheck size={48} className="text-marine-700 mb-4" />
               <p className="text-slate-500 text-sm font-medium">
-                Select a mission to view briefing and initiate recovery.
+                {t('select_mission_briefing')}
               </p>
             </div>
           )}

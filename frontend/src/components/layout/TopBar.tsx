@@ -2,11 +2,13 @@
 
 import React, { useEffect, useState } from "react";
 import { Search, User, Compass, LogOut, AlertTriangle, X } from "lucide-react";
-import NotificationCenter from "./NotificationCenter";
+import NotificationHub from "../notifications/NotificationHub";
+import LanguageSwitcher from "./LanguageSwitcher";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { useLanguage } from '@/context/LanguageContext';
 
 const suggestSeaArea = (lat: number, lng: number) => {
   let area = "Indian Ocean";
@@ -18,10 +20,11 @@ const suggestSeaArea = (lat: number, lng: number) => {
 };
 
 export default function TopBar() {
+  const { t } = useLanguage();
   const [user, setUser] = useState<any>(null);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [currentLocation, setCurrentLocation] = useState<{lat: number, lng: number} | null>(null);
-  const [areaName, setAreaName] = useState<string>("Detecting Location...");
+  const [areaName, setAreaName] = useState<string>(t('detecting_location'));
   const router = useRouter();
 
   useEffect(() => {
@@ -42,7 +45,7 @@ export default function TopBar() {
         setAreaName(suggestSeaArea(latitude, longitude));
       }, (err) => {
         console.error("TopBar location error:", err);
-        setAreaName("Maritime Zone Unknown");
+        setAreaName(t('maritime_zone_unknown'));
       });
     }
 
@@ -76,14 +79,15 @@ export default function TopBar() {
             />
             <input
               type="text"
-              placeholder="Search coordinates, vessels, or IDs..."
+              placeholder={t('search_placeholder')}
               className="w-full bg-slate-50 border border-slate-200 rounded-full py-2 pl-10 pr-4 text-sm focus:outline-none focus:border-marine-accent focus:ring-4 focus:ring-marine-accent/10 focus:bg-white transition-all font-medium"
             />
           </div>
         </div>
 
-        <div className="flex items-center gap-6">
-          <NotificationCenter />
+        <div className="flex items-center gap-4">
+          <LanguageSwitcher />
+          <NotificationHub />
 
           <div className="hidden lg:flex items-center gap-3 px-4 py-1.5 bg-slate-100 rounded-full border border-slate-200 text-[10px] font-black tracking-wider text-slate-600 shadow-sm">
             <Compass
@@ -104,21 +108,21 @@ export default function TopBar() {
             {user ? (
               <div className="text-right hidden sm:block">
                 <p className="text-sm font-black text-slate-900 leading-none">
-                  {user.user_metadata?.full_name || "Guardian"}
+                  {user.user_metadata?.full_name || t('welcome_back')}
                 </p>
                 <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold mt-1">
                   {user.user_metadata?.user_type?.replace("_", " ") ||
-                    "Registered User"}{" "}
+                    t('registered_user')}{" "}
                   • {user.user_metadata?.id_code || "N/A"}
                 </p>
               </div>
             ) : (
               <div className="text-right hidden sm:block">
                 <p className="text-sm font-black text-slate-400 leading-none italic">
-                  Guest Guardian
+                  {t('guest_guardian')}
                 </p>
                 <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold mt-1">
-                  View-Only Access
+                  {t('view_only_access')}
                 </p>
               </div>
             )}
@@ -138,7 +142,7 @@ export default function TopBar() {
                     onClick={() => setShowLogoutConfirm(true)}
                     className="w-full flex items-center gap-3 px-4 py-3 text-rose-500 hover:bg-rose-50 rounded-lg text-xs font-black uppercase tracking-widest transition-colors"
                   >
-                    <LogOut size={16} /> Disconnect
+                    <LogOut size={16} /> {t('logout')}
                   </button>
                 </div>
               )}
@@ -173,11 +177,10 @@ export default function TopBar() {
                 </div>
 
                 <h3 className="text-2xl font-black text-slate-900 tracking-tight mb-2">
-                  Confirm Disconnect
+                  {t('confirm_disconnect')}
                 </h3>
                 <p className="text-slate-500 text-sm font-medium leading-relaxed">
-                  Are you sure you want to terminate your current session? You
-                  will need to re-authenticate for field operations.
+                  {t('logout_warning')}
                 </p>
               </div>
 
@@ -186,13 +189,13 @@ export default function TopBar() {
                   onClick={() => setShowLogoutConfirm(false)}
                   className="flex-1 px-6 py-4 rounded-2xl text-xs font-black uppercase tracking-widest text-slate-500 hover:bg-slate-200 transition-colors"
                 >
-                  Cancel
+                  {t('cancel')}
                 </button>
                 <button
                   onClick={handleLogout}
                   className="flex-1 px-6 py-4 rounded-2xl text-xs font-black uppercase tracking-widest bg-rose-500 text-white hover:bg-rose-600 shadow-lg shadow-rose-500/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
                 >
-                  Disconnect
+                  {t('disconnect')}
                 </button>
               </div>
 

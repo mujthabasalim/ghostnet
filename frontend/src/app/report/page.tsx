@@ -1,15 +1,18 @@
-import React from "react";
+"use client";
+
 import ReportForm from "@/components/ReportForm";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function ReportPage() {
+  const { t } = useLanguage();
   return (
     <div className="space-y-8">
       <div className="flex flex-col gap-2">
         <h1 className="text-3xl font-bold tracking-tight text-black">
-          Issue Hazard Report
+          {t('issue_hazard_report')}
         </h1>
         <p className="text-slate-400">
-          Report a lost net to warn other vessels and initiate retrieval.
+          {t('report_description')}
         </p>
       </div>
 

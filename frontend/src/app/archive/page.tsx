@@ -23,13 +23,16 @@ import { motion, AnimatePresence } from "framer-motion";
 import { toPng } from "html-to-image";
 import download from "downloadjs";
 import Image from "next/image";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function ArchivePage() {
+  const { t } = useLanguage();
   const [nets, setNets] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
   const [selectedCertificate, setSelectedCertificate] = useState<any>(null);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(5);
   const certificateRef = React.useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -87,10 +90,10 @@ export default function ArchivePage() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="flex flex-col gap-2">
             <h1 className="text-3xl font-black tracking-tight text-slate-900">
-              Retrieved Archive
+              {t('retrieved_archive')}
             </h1>
             <p className="text-slate-500 font-medium">
-              Historical record of successful recovery missions.
+              {t('historical_record')}
             </p>
           </div>
         </div>
@@ -98,7 +101,7 @@ export default function ArchivePage() {
         <div className="glass-card overflow-hidden shadow-2xl">
           <div className="p-8 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white/40">
             <h3 className="text-xl font-black text-slate-900 tracking-tight">
-              Historical Reports
+              {t('historical_reports')}
             </h3>
             <div className="relative w-full md:w-80">
               <Search
@@ -117,16 +120,16 @@ export default function ArchivePage() {
             <table className="w-full text-left">
               <thead>
                 <tr className="bg-slate-50/80 text-slate-400 text-[10px] uppercase tracking-widest font-black border-b border-slate-100">
-                  <th className="px-8 py-5">Hazard ID</th>
-                  <th className="px-8 py-5">Net Type</th>
-                  <th className="px-8 py-5">Location</th>
-                  <th className="px-8 py-5">Retrieved By</th>
-                  <th className="px-8 py-5">Verification</th>
-                  <th className="px-8 py-5 text-right">Report</th>
+                  <th className="px-8 py-5">{t('hazard_id')}</th>
+                  <th className="px-8 py-5">{t('net_type')}</th>
+                  <th className="px-8 py-5">{t('location')}</th>
+                  <th className="px-8 py-5">{t('retrieved_by')}</th>
+                  <th className="px-8 py-5">{t('verification')}</th>
+                  <th className="px-8 py-5 text-right">{t('report')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
-                {nets.map((net) => (
+                {nets.slice(0, visibleCount).map((net) => (
                   <tr
                     key={net.id}
                     onClick={() => setSelectedCertificate(net)}
@@ -196,7 +199,7 @@ export default function ArchivePage() {
                       colSpan={6}
                       className="px-8 py-20 text-center text-slate-400 font-bold uppercase tracking-widest opacity-50"
                     >
-                      No archived missions found
+                      {t('no_archived_missions')}
                     </td>
                   </tr>
                 )}
@@ -204,11 +207,19 @@ export default function ArchivePage() {
             </table>
           </div>
 
-          <div className="p-6 bg-slate-50/30 text-center border-t border-slate-50">
-            <button className="text-slate-400 text-xs font-black uppercase tracking-widest hover:text-slate-900 transition-colors py-2 px-6 rounded-full hover:bg-white shadow-sm border border-transparent hover:border-slate-200">
-              Load More History
-            </button>
-          </div>
+          {nets.length > visibleCount && (
+            <div className="p-8 flex justify-center bg-slate-50/30 border-t border-slate-50">
+              <button 
+                onClick={() => setVisibleCount(prev => prev + 5)}
+                className="flex items-center gap-3 px-8 py-3 bg-white border border-slate-200 rounded-2xl text-[10px] font-black text-slate-900 uppercase tracking-[0.2em] hover:bg-slate-50 hover:shadow-xl hover:scale-105 transition-all active:scale-95 group shadow-sm"
+              >
+                {t('load_more_missions')}
+                <div className="w-5 h-5 rounded-full bg-slate-900 text-white flex items-center justify-center text-[10px] group-hover:rotate-180 transition-transform">
+                  +
+                </div>
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -274,7 +285,7 @@ export default function ArchivePage() {
                       <div className="flex flex-col items-center gap-4 text-slate-700">
                         <Anchor size={64} className="opacity-20" />
                         <span className="text-[10px] font-black uppercase tracking-widest">
-                          No Visual Evidence
+                          {t('no_evidence')}
                         </span>
                       </div>
                     )}
@@ -282,13 +293,13 @@ export default function ArchivePage() {
                     {/* Official Overlays */}
                     <div className="absolute top-8 left-8 flex flex-col gap-2">
                       <div className="bg-emerald-500 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] shadow-2xl flex items-center gap-2">
-                        <ShieldCheck size={14} /> Certified Retrieval
+                        <ShieldCheck size={14} /> {t('certified_retrievals')}
                       </div>
                     </div>
 
                     <div className="absolute bottom-0 left-0 w-full p-8 bg-gradient-to-t from-slate-950 to-transparent">
                       <p className="text-[10px] font-black text-emerald-400 uppercase tracking-widest mb-1">
-                        Recovery Coordinates
+                        {t('location')}
                       </p>
                       <p className="text-sm font-mono text-white opacity-80">
                         {(
@@ -323,9 +334,9 @@ export default function ArchivePage() {
                           </span>
                         </div>
                         <h2 className="text-4xl font-black text-slate-900 tracking-tight leading-none">
-                          Retrieval
+                          {t('retrieval')}
                           <br />
-                          Certificate
+                          {t('certificate')}
                         </h2>
                         <p className="text-slate-400 font-bold uppercase text-[10px] tracking-widest mt-4">
                           Serial: GN-SYS-
@@ -340,7 +351,7 @@ export default function ArchivePage() {
                       <div className="grid grid-cols-2 gap-8">
                         <div className="space-y-1">
                           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                            Hazard Type
+                            {t('hazard_id')}
                           </p>
                           <p className="text-base font-black text-slate-900">
                             {selectedCertificate.net_type}
@@ -371,14 +382,14 @@ export default function ArchivePage() {
                           </div>
                           <div>
                             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                              Recovery Agent
-                            </p>
+                                {t('retrieved_by')}
+                              </p>
                             <p className="text-sm font-black text-slate-900">
                               {selectedCertificate.retriever?.full_name ||
-                                "Verified Specialist"}
+                                t('verified_specialist')}
                             </p>
                             <p className="text-[10px] text-marine-accent font-bold uppercase tracking-wider">
-                              Credential ID:{" "}
+                              {t('credential_id')}:{" "}
                               {selectedCertificate.retriever?.id_code ||
                                 "NON-SPEC"}
                             </p>

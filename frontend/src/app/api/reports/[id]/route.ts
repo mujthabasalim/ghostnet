@@ -42,6 +42,30 @@ export async function PUT(
       .select();
 
     if (error) throw error;
+
+    // Broadcast the update to EVERYONE on the platform (Public & Auth)
+    if (updateData.status === 'IN_PROGRESS' || updateData.status === 'RETRIEVED') {
+      const { data: net } = await supabaseAdmin
+        .from('ghost_nets')
+        .select('net_type, area_name')
+        .eq('id', id)
+        .single();
+
+      if (net) {
+        await supabase.channel('maritime-alerts').send({
+          type: 'broadcast',
+          event: 'new-hazard', // Using same event for simplicity in the listener
+          payload: {
+            title: updateData.status === 'IN_PROGRESS' ? 'Retrieval Initialized' : 'Hazard Recovered',
+            message: updateData.status === 'IN_PROGRESS' 
+              ? `A recovery mission has begun for the ${net.net_type} in ${net.area_name}.`
+              : `The ${net.net_type} in ${net.area_name} has been successfully cleared!`,
+            type: updateData.status === 'IN_PROGRESS' ? 'RETRIEVAL_START' : 'RETRIEVAL_COMPLETE'
+          }
+        });
+      }
+    }
+
     return NextResponse.json({ success: true, data });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

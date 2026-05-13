@@ -107,6 +107,18 @@ export async function POST(req: Request) {
       .select();
 
     if (error) throw error;
+
+    // Trigger Real-time Broadcast for all users (Public & Auth)
+    await supabase.channel('maritime-alerts').send({
+      type: 'broadcast',
+      event: 'new-hazard',
+      payload: {
+        title: 'New Hazard Reported',
+        message: `A ${reportData.netType} has been spotted in ${reportData.areaName}.`,
+        type: 'REPORT_CREATED'
+      }
+    });
+
     return NextResponse.json({ success: true, data }, { status: 201 });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });

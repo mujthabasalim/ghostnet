@@ -11,59 +11,61 @@ const Map = dynamic(() => import("@/components/map"), {
 });
 import { checkProximity } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
-
-const statsConfig = [
-  {
-    name: "Active Hazards",
-    key: "ACTIVE",
-    icon: AlertTriangle,
-    color: "text-rose-500",
-    bg: "bg-rose-500/10",
-  },
-  {
-    name: "In Progress",
-    key: "IN_PROGRESS",
-    icon: Activity,
-    color: "text-amber-500",
-    bg: "bg-amber-500/10",
-  },
-  {
-    name: "Successfully Retrieved",
-    key: "RETRIEVED",
-    icon: CheckCircle2,
-    color: "text-emerald-500",
-    bg: "bg-emerald-500/10",
-  },
-  {
-    name: "Nearby Vessels",
-    key: "VESSELS",
-    icon: Ship,
-    color: "text-marine-accent",
-    bg: "bg-marine-accent/10",
-  },
-];
-
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.1 as const },
-  },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.5, ease: "easeOut" as const },
-  },
-};
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function DashboardComponent() {
   const { vessels, loading: aisLoading } = useAIS();
   const [nets, setNets] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const { t } = useLanguage();
+
+  const containerVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.6,
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 },
+  };
+
+  const statsConfig = [
+    {
+      name: t('active_hazards'),
+      key: "ACTIVE",
+      icon: AlertTriangle,
+      color: "text-rose-500",
+      bg: "bg-rose-500/10",
+    },
+    {
+      name: t('in_progress'),
+      key: "IN_PROGRESS",
+      icon: Activity,
+      color: "text-amber-500",
+      bg: "bg-amber-500/10",
+    },
+    {
+      name: t('missions_completed'),
+      key: "RETRIEVED",
+      icon: CheckCircle2,
+      color: "text-emerald-500",
+      bg: "bg-emerald-500/10",
+    },
+    {
+      name: t('vessels'),
+      key: "VESSELS",
+      icon: Ship,
+      color: "text-marine-accent",
+      bg: "bg-marine-accent/10",
+    },
+  ];
 
   useEffect(() => {
     const fetchNets = async () => {
@@ -117,10 +119,10 @@ export default function DashboardComponent() {
     >
       <motion.div variants={itemVariants} className="flex flex-col gap-2">
         <h1 className="text-4xl font-black tracking-tight text-slate-900">
-          Command Center
+          {t('command_center')}
         </h1>
         <p className="text-slate-500 text-lg font-medium">
-          Real-time situational awareness for marine safety.
+          {t('situational_awareness')}
         </p>
       </motion.div>
 
@@ -162,7 +164,7 @@ export default function DashboardComponent() {
           <div className="absolute top-6 left-6 z-10 flex gap-3">
             <div className="px-4 py-2 bg-white/80 backdrop-blur-md rounded-full text-sm font-bold text-slate-900 flex items-center gap-2 shadow-lg border border-white/50">
               <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
-              Live AIS Feed
+              {t('live_ais_feed')}
             </div>
           </div>
 
@@ -174,7 +176,7 @@ export default function DashboardComponent() {
         <motion.div variants={itemVariants} className="space-y-6">
           <div className="glass-card p-6 border-white/60">
             <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
-              Real-time Alerts
+              {t('alerts')}
             </h3>
             <div className="space-y-4 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar">
               <AnimatePresence>
@@ -212,7 +214,7 @@ export default function DashboardComponent() {
                       size={32}
                     />
                     <p className="text-xs uppercase tracking-[0.2em] font-black text-slate-900">
-                      No critical threats
+                      {t('no_critical_threats')}
                     </p>
                   </div>
                 )}
@@ -222,7 +224,7 @@ export default function DashboardComponent() {
 
           <div className="glass-card p-6 border-white/60">
             <h3 className="text-xl font-bold text-slate-900 mb-6">
-              Active Missions
+              {t('active_missions')}
             </h3>
             <div className="space-y-4">
               {nets

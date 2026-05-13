@@ -15,19 +15,20 @@ import {
   X
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-
-const navItems = [
-  { name: 'Dashboard', href: '/dashboard', icon: MapIcon },
-  { name: 'Report Net', href: '/report', icon: PlusCircle },
-  { name: 'Retrievals', href: '/retrievals', icon: ShieldCheck },
-  { name: 'Archive', href: '/archive', icon: History },
-];
-
+import { useLanguage } from '@/context/LanguageContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Sidebar() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = React.useState(true);
+  const { t } = useLanguage();
+
+  const navItems = [
+    { name: t('dashboard'), href: '/dashboard', icon: MapIcon },
+    { name: t('report_net'), href: '/report', icon: PlusCircle },
+    { name: t('retrievals'), href: '/retrievals', icon: ShieldCheck },
+    { name: t('archive'), href: '/archive', icon: History },
+  ];
 
   return (
     <>
@@ -114,22 +115,10 @@ export default function Sidebar() {
           </nav>
 
           <div className="pt-6 border-t border-slate-100 space-y-3">
-            <Link href="/notifications" className="flex items-center gap-3 p-3.5 rounded-2xl text-slate-500 hover:bg-slate-50 hover:text-slate-900 group transition-all">
-              <Bell size={22} />
-              <AnimatePresence>
-                {isOpen && (
-                  <motion.span 
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="font-bold text-sm"
-                  >
-                    Notifications
-                  </motion.span>
-                )}
-              </AnimatePresence>
-            </Link>
-            <Link href="/settings" className="flex items-center gap-3 p-3.5 rounded-2xl text-slate-500 hover:bg-slate-50 hover:text-slate-900 group transition-all">
+            <Link href="/settings" className={cn(
+              "flex items-center gap-3 p-3.5 rounded-2xl transition-all duration-300 group relative",
+              pathname === '/settings' ? "bg-slate-900 text-white" : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
+            )}>
               <Settings size={22} />
               <AnimatePresence>
                 {isOpen && (
@@ -139,7 +128,7 @@ export default function Sidebar() {
                     exit={{ opacity: 0 }}
                     className="font-bold text-sm"
                   >
-                    Settings
+                    {t('settings')}
                   </motion.span>
                 )}
               </AnimatePresence>
