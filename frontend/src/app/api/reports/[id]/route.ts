@@ -23,11 +23,10 @@ export async function PUT(
 
     if (body.status === 'RETRIEVED') {
       updateData.retrieved_at = new Date().toISOString();
+      updateData.retrieved_by = user.id;
       
-      // Only include these if you've added them to your DB
-      // For now, let's store image_url as the main image if it's a retrieval proof
       if (body.retrieval_image_url) {
-        updateData.image_url = body.retrieval_image_url;
+        updateData.retrieval_image_url = body.retrieval_image_url;
       }
 
       // If you want to store notes about the retrieval location
